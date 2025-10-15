@@ -9,11 +9,11 @@ import discord
 def setup(bot):
 	@bot.event
 	async def on_ready():
+		game_manager.on_startup()
 		print('Burger Joint Bot Online')
-		
-		for guild in bot.guilds:
-			channel = guild.system_channel
-			await channel.send('Burger Joint Bot Online')
+		#for guild in bot.guilds:
+		#	channel = guild.system_channel
+		#	await channel.send('Burger Joint Bot Online')
 
 	@bot.command(description="Display your joint's status.")
 	async def status(ctx : discord.ApplicationContext): 
