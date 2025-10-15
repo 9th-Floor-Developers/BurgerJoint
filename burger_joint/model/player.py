@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from . import Upgrade
-from . import Employee
-from . import Badge
+from burger_joint.model.upgrades import Upgrade, Employee
+from burger_joint.model.badge import Badge
 
 
 @dataclass

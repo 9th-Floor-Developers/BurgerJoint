@@ -1,8 +1,12 @@
+
+"""Manipulates game state, player data, etc.x"""
+
 from model import Player 
 import discord
 
 players : list[Player] = []
 
+"""Add a new player and initialize their data"""
 def init_player(discord_user : discord.User) -> None:
     players.append(Player(
         user_id=discord_user.id,
@@ -17,3 +21,9 @@ def init_player(discord_user : discord.User) -> None:
         badges=[],
         prestige=0
     ))
+
+def get_player(user_id : int) -> Player | None:
+    for player in players:
+        if player.user_id == user_id:
+            return player
+    return None
