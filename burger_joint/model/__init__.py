@@ -1,2 +1,12 @@
 # data class modules
-__all__ = []
+
+from .player import Player
+from .upgrades import Upgrade, Employee
+from .badge import Badge
+
+__all__ = [
+	'Player',
+	'Upgrade',
+	'Employee',
+	'Badge'
+]
