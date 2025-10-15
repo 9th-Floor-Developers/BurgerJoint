@@ -1,15 +1,15 @@
 """Entry point for discord bot"""
 
 import os
-from bot import setup
 
-from discord import Bot, Intents
+from discord import Bot
 from dotenv import load_dotenv
+
+from burger_joint.bot import setup
 
 
 def main():
-	bot: Bot = Bot(intents=Intents.all())
-	setup(bot)
+	bot: Bot = setup()
 	load_dotenv()
 	bot.run(os.getenv('DISCORD_TOKEN'))
 
