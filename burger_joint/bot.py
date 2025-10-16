@@ -13,6 +13,11 @@ bot = Bot(intents=Intents.all())
 
 
 def setup() -> Bot:
+	all_cogs = [
+		'leaderboards'
+	]
+	for cog in all_cogs:
+		bot.load_extension(f'cogs.{cog}')
 	return bot
 
 

@@ -46,6 +46,17 @@ def get_player(id: int) -> Player | None:
 	return None
 
 
+def get_all_players() -> list[Player]:
+	with open(json_path()) as f:
+		file: list[dict[str, Any]] = json.load(f)
+		players: list[Player] = []
+		
+		for player_json in file:
+			players.append(Player(**player_json))
+		
+		return players
+
+
 def json_convert(obj: Any):
 	if isinstance(obj, Enum):
 		return obj.value

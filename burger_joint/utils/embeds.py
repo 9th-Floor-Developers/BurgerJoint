@@ -5,6 +5,7 @@ from discord import Color, Embed, User
 
 from burger_joint.model import Player
 from burger_joint.utils.constants import ALL_BADGES
+from burger_joint.utils.enums import LeaderboardID
 
 
 def simple_embed(
@@ -68,5 +69,24 @@ def badges_embed(player: Player) -> Embed:
 	embed.set_footer(
 		text=f'Total Progress: {len(player.badges) // len(ALL_BADGES)}%'
 	)
+	
+	return embed
+
+
+def leaderboard_embed(
+	players: list[Player],
+	leaderboard_type: LeaderboardID
+) -> Embed:
+	embed = Embed(
+		title=f"🍔 {leaderboard_type.value[0]} Leaderboard 🍔",
+		color=discord.Color.purple()
+	)
+	
+	for i, player in enumerate(players):
+		embed.add_field(
+			name=f"{i + 1}. {player.shop_name} - {player.__getattribute__(leaderboard_type.value[1])} {leaderboard_type.value[0]}",
+			value="",
+			inline=False
+		)
 	
 	return embed
