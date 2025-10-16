@@ -15,3 +15,17 @@ class LeaderboardID(Enum):
 	XP = ('XP', 'xp')
 	BURGERS_SOLD= ('Burgers', 'burgers_sold')
 	PRESTIGE = ('Prestige', 'prestige')
+
+
+class FoodItemID(Enum):
+	CLASSIC_BURGER = 'Classic Burger'
+	FRIES = 'Fries'
+	SODA = 'Soda'
+	VEGGIE_BURGER = 'Veggie Burger'
+	CHICKEN_SANDWICH = 'Chicken Sandwich'
+
+
+class FoodCategoryID(Enum):
+	BURGER = 'Burger'
+	SNACK = 'Snack'
+	DRINK = 'Drink'

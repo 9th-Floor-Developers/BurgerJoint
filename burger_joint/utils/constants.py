@@ -1,5 +1,6 @@
 from burger_joint.model.badge import Badge
-from burger_joint.utils.enums import BadgeID
+from burger_joint.model.food_item import FoodItem
+from burger_joint.utils.enums import BadgeID, FoodItemID, FoodCategoryID
 
 ALL_BADGES: dict[BadgeID, Badge] = {
 	BadgeID.RENAME_SHACK: Badge(BadgeID.RENAME_SHACK.value, None, 1_000),
@@ -9,4 +10,12 @@ ALL_BADGES: dict[BadgeID, Badge] = {
 	BadgeID.SELL_100_BURGERS: Badge(BadgeID.SELL_100_BURGERS.value, None, 1_000),
 	BadgeID.SELL_1000_BURGERS: Badge(BadgeID.SELL_1000_BURGERS.value, None, 10_000),
 	BadgeID.SELL_10000_BURGERS: Badge(BadgeID.SELL_10000_BURGERS.value, None, 100_000)
+}
+
+ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
+	FoodItemID.CLASSIC_BURGER: FoodItem(FoodItemID.CLASSIC_BURGER.value, 500, 1, FoodCategoryID.BURGER),
+	FoodItemID.FRIES: FoodItem(FoodItemID.FRIES.value, 200, 1, FoodCategoryID.SNACK),
+	FoodItemID.SODA: FoodItem(FoodItemID.SODA.value, 150, 1, FoodCategoryID.DRINK),
+	FoodItemID.VEGGIE_BURGER: FoodItem(FoodItemID.VEGGIE_BURGER.value, 600, 2, FoodCategoryID.BURGER),
+	FoodItemID.CHICKEN_SANDWICH: FoodItem(FoodItemID.CHICKEN_SANDWICH.value, 700, 2, FoodCategoryID.BURGER)
 }
