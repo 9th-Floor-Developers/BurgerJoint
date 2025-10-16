@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 
-from burger_joint.model.badge import Badge
+from discord import ApplicationContext
+
 from burger_joint.model.upgrades import Employee, Upgrade
+from burger_joint.utils.constants import ALL_BADGES
+from burger_joint.utils import BadgeID
 
 
 @dataclass
@@ -15,11 +18,28 @@ class Player:
 	burgers_sold: int
 	upgrades: list[Upgrade]
 	employees: list[Employee]
-	badges: list[Badge]
+	badges: set[BadgeID]
 	prestige: int
 	
 	def __post_init__(self):
 		pass  # any calculations after init if necessary
-
-# TODO Related Commands:
-#  - /rename <NAME>
+	
+	async def unlock_badge(
+		self,
+		badge_id: BadgeID,
+		ctx: ApplicationContext
+	) -> None:
+		from burger_joint.utils import embeds
+		
+		if not self.has_badge(badge_id):
+			self.badges.add(badge_id)
+			self.balance += ALL_BADGES[badge_id].reward
+			await ctx.send(
+				embed=embeds.simple_embed(
+					f'🎉 {ctx.author.name} has earned the {badge_id.value} badge!',
+					f'{self.shop_name} received ${ALL_BADGES[badge_id].reward}!'
+				)
+			)
+	
+	def has_badge(self, badge_id: BadgeID) -> bool:
+		return badge_id in self.badges
