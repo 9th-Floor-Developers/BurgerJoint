@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from burger_joint.model.player import Player
 
@@ -13,13 +14,19 @@ def json_path() -> str:
 	return data_path
 
 
-# TODO: update somehow with individual player data save/load
-#  instead of reading/writing ALL player data
-def load_players_data():
-	with open(json_path(), 'r') as f:
-		return [Player(**data) for data in json.load(f)]
+def get_player(id: int) -> Player | None:
+	with open(json_path()) as f:
+		file: list[dict[str, Any]] = json.load(f)
+		for player_json in file:
+			if player_json['user_id'] == id:
+				return Player(**player_json)
+	return None
 
 
-def save_players_data(data: list[Player]):
-	with open(json_path(), 'w') as f:
-		json.dump([player.__dict__ for player in data], f, indent=4)
+def save_data(player: Player) -> None:
+	with open(json_path(), 'r+') as f:
+		file: list[dict[str, Any]] = json.load(f)
+		file.append(player.__dict__)
+		f.seek(0)
+		json.dump(file, f, indent=4)
+		f.truncate()

@@ -3,10 +3,14 @@
 import discord
 from discord import Bot, Intents
 
-import game_manager
+from burger_joint.cogs.player_commands import PlayerCommands
+from burger_joint.model import Player
+from burger_joint.utils import database
 from utils.embeds import get_status_embed
 
 bot = Bot(intents=Intents.all())
+player_commands = PlayerCommands()
+bot.add_cog(player_commands)
 
 
 def setup() -> Bot:
@@ -15,7 +19,6 @@ def setup() -> Bot:
 
 @bot.event
 async def on_ready():
-	game_manager.on_startup()
 	print('Burger Joint Bot Online')
 
 
@@ -23,13 +26,10 @@ async def on_ready():
 #	channel = guild.system_channel
 #	await channel.send('Burger Joint Bot Online')
 
-@bot.command(description="Display your joint's status.")
+@bot.slash_command(description="Display your joint's status.")
 async def status(ctx: discord.ApplicationContext):
-	if not game_manager.get_player(ctx.user.id):
-		game_manager.init_player(ctx.user)
+	player: Player | None = database.get_player(ctx.author.id)
+	if not player:
+		player = player_commands.create_new_player(ctx.author)
 	
-	await ctx.respond(
-		embed=get_status_embed(
-			game_manager.get_player(ctx.user.id)
-		)
-	)
+	await ctx.respond(embed=get_status_embed(player))

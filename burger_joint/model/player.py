@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from burger_joint.model.upgrades import Upgrade, Employee
+
 from burger_joint.model.badge import Badge
+from burger_joint.model.upgrades import Employee, Upgrade
 
 
 @dataclass
@@ -21,7 +22,4 @@ class Player:
 		pass  # any calculations after init if necessary
 
 # TODO Related Commands:
-#  - /profile
 #  - /rename <NAME>
-#  - /stats
-#  - /prestige
