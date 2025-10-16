@@ -98,3 +98,8 @@ async def rename(ctx: ApplicationContext, new_name: str):
 @player_check
 async def badges(ctx: ApplicationContext):
 	await ctx.respond(embed=embeds.badges_embed(ctx.player))
+
+@bot.slash_command(description='')
+@player_check
+async def work(ctx: ApplicationContext):
+	await ctx.respond("work in progress")

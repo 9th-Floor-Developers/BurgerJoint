@@ -9,3 +9,17 @@ class BadgeID(Enum):
 	SELL_100_BURGERS = 'Sell 100 Burgers'
 	SELL_1000_BURGERS = 'Sell 1000 Burgers'
 	SELL_10000_BURGERS = 'Sell 10000 Burgers'
+
+
+class FoodItemID(Enum):
+	CLASSIC_BURGER = 'Classic Burger'
+	FRIES = 'Fries'
+	SODA = 'Soda'
+	VEGGIE_BURGER = 'Veggie Burger'
+	CHICKEN_SANDWICH = 'Chicken Sandwich'
+
+
+class FoodCategoryID(Enum):
+	BURGER = 'Burger'
+	SNACK = 'Snack'
+	DRINK = 'Drink'
