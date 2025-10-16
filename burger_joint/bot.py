@@ -1,7 +1,8 @@
 """Bot initialization, event loop, command loader"""
+import functools
 
 import discord
-from discord import ApplicationContext, Bot, Intents
+from discord import ApplicationContext, Bot, commands, Intents
 
 from burger_joint.model import Player
 from burger_joint.utils import database
@@ -14,14 +15,33 @@ def setup() -> Bot:
 	return bot
 
 
+def player_check(func):
+	@functools.wraps(func)
+	async def wrapper(*args, **kwargs):
+		ctx: ApplicationContext = args[0]
+		player: Player | None = database.get_player(ctx.author.id)
+		if not player:
+			await ctx.respond(
+				embed=embeds.simple_embed(
+					'❌ You do not own a burger joint!',
+					'Use the `/start` command to start your very own burger joint!',
+					discord.Color.red()
+				)
+			)
+			return None
+		
+		args[0].player = player
+		result = await func(*args, **kwargs)
+		database.save_data(player)
+		return result
+	
+	return wrapper
+
+
 @bot.event
 async def on_ready():
 	print('Burger Joint Bot Online')
 
-
-# for guild in bot.guilds:
-#	channel = guild.system_channel
-#	await channel.send('Burger Joint Bot Online')
 
 @bot.slash_command(description='')
 async def start(ctx: ApplicationContext):
@@ -43,36 +63,17 @@ async def start(ctx: ApplicationContext):
 
 
 @bot.slash_command(description="Display your joint's status.")
+@player_check
 async def status(ctx: ApplicationContext):
-	player: Player | None = database.get_player(ctx.author.id)
-	if not player:
-		await ctx.respond(
-			embed=embeds.simple_embed(
-				'❌ You do not own a burger joint!',
-				'Use the `/start` command to start your very own burger joint!',
-				discord.Color.red()
-			)
-		)
-		return
-	
+	player: Player = ctx.player
 	await ctx.respond(embed=embeds.status_embed(player))
 
 
 @bot.slash_command(description='Rename your burger joint.')
+@player_check
 async def rename(ctx: ApplicationContext, new_name: str):
-	player: Player | None = database.get_player(ctx.author.id)
-	if not player:
-		await ctx.respond(
-			embed=embeds.simple_embed(
-				'❌ You do not own a burger joint!',
-				'Use the `/start` command to start your very own burger joint!',
-				discord.Color.red()
-			)
-		)
-		return
-	
+	player: Player = ctx.player
 	player.shop_name = new_name
-	database.save_data(player)
 	await ctx.respond(
 		embed=embeds.simple_embed(
 			f'✅ Changed burger joint name to: {player.shop_name}!'
