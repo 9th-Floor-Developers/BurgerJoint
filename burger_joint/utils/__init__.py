@@ -1,2 +1,8 @@
 # general utils, constants, enums, etc.
-__all__ = []
+from .constants import ALL_BADGES
+from .enums import BadgeID
+
+__all__ = [
+	'ALL_BADGES',
+	'BadgeID'
+]
