@@ -22,7 +22,7 @@ def create_new_player(user: User):
 	player = Player(
 		user_id=user.id, username=user.name,
 		shop_name=f"{user.name}'s Burger Joint", balance=100, level=1,
-		xp=0, burgers_sold=0, upgrades=[], employees=[], badges=set(), menu_items=STARTING_MENU,
+		xp=0, burgers_sold=0, upgrades=[], employees=[], badges=set(), menu_items=set(STARTING_MENU),
 		prestige=0
 	)
 	save_data(player)
@@ -40,6 +40,11 @@ def get_player(id: int) -> Player | None:
 				player.badges = {
 					BadgeID(badge)
 					for badge in player.badges
+				}
+				
+				player.menu_items = {
+					FoodItemID(item)
+					for item in player.menu_items
 				}
 				
 				return player
