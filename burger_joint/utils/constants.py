@@ -19,3 +19,5 @@ ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
 	FoodItemID.VEGGIE_BURGER: FoodItem(FoodItemID.VEGGIE_BURGER.value, 600, 2, FoodCategoryID.BURGER),
 	FoodItemID.CHICKEN_SANDWICH: FoodItem(FoodItemID.CHICKEN_SANDWICH.value, 700, 2, FoodCategoryID.BURGER)
 }
+
+STARTING_MENU = [FoodItemID.CLASSIC_BURGER, FoodItemID.FRIES, FoodItemID.SODA]

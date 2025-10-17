@@ -15,6 +15,7 @@ bot = Bot(intents=Intents.all())
 def setup() -> Bot:
 	all_cogs = [
 		'leaderboards'
+		,'work_commands'
 	]
 	for cog in all_cogs:
 		bot.load_extension(f'cogs.{cog}')
@@ -24,7 +25,14 @@ def setup() -> Bot:
 def player_check(func):
 	@functools.wraps(func)
 	async def wrapper(*args, **kwargs):
-		ctx: ApplicationContext = args[0]
+		ctx: ApplicationContext 
+		if isinstance(args[0], ApplicationContext):
+			ctx = args[0]
+		elif len(args) > 1 and isinstance(args[1], ApplicationContext):
+			ctx = args[1]
+		else:
+			raise ValueError('No ApplicationContext found in arguments of funcion decorated with @player_check')
+
 		player: Player | None = database.get_player(ctx.author.id)
 		if not player:
 			await ctx.respond(
@@ -103,8 +111,3 @@ async def rename(ctx: ApplicationContext, new_name: str):
 @player_check
 async def badges(ctx: ApplicationContext):
 	await ctx.respond(embed=embeds.badges_embed(ctx.player))
-
-@bot.slash_command(description='')
-@player_check
-async def work(ctx: ApplicationContext):
-	await ctx.respond("work in progress")
