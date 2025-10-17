@@ -3,6 +3,7 @@
 import discord
 from discord import Color, Embed, User
 
+from burger_joint.cogs.mini_games.blackjack import Card
 from burger_joint.model import Player
 from burger_joint.utils.constants import ALL_BADGES
 from burger_joint.utils.enums import LeaderboardID
@@ -84,7 +85,9 @@ def leaderboard_embed(
 	
 	for i, player in enumerate(players):
 		embed.add_field(
-			name=f"{i + 1}. {player.shop_name} - {player.__getattribute__(leaderboard_type.value[1])} {leaderboard_type.value[0]}",
+			name=f"{i + 1}. {player.shop_name} - "
+			     f"{getattr(player, leaderboard_type.value[1])} "
+			     f"{leaderboard_type.value[0]}",
 			value="",
 			inline=False
 		)

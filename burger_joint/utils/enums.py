@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class BadgeID(Enum):
-	RENAME_SHACK = 'Rename Your Shack'
+	RENAME_JOINT = 'Rename Your Burger Joint'
 	ADD_MENU_ITEM = 'Add A Menu Item'
 	REACH_5K_INCOME = 'Reach $5,000 Income'
 	SELL_1_BURGER = 'Sell 1 Burger'

@@ -14,8 +14,8 @@ bot = Bot(intents=Intents.all())
 
 def setup() -> Bot:
 	all_cogs = [
-		'leaderboards'
-		,'work_commands'
+		'leaderboards',
+		'work_commands',
 	]
 	for cog in all_cogs:
 		bot.load_extension(f'cogs.{cog}')
@@ -25,17 +25,20 @@ def setup() -> Bot:
 def player_check(func):
 	@functools.wraps(func)
 	async def wrapper(*args, **kwargs):
-		ctx: ApplicationContext 
+		idx: int
 		if isinstance(args[0], ApplicationContext):
-			ctx = args[0]
+			idx = 0
 		elif len(args) > 1 and isinstance(args[1], ApplicationContext):
-			ctx = args[1]
+			idx = 1
 		else:
-			raise ValueError('No ApplicationContext found in arguments of funcion decorated with @player_check')
-
-		player: Player | None = database.get_player(ctx.author.id)
+			raise ValueError(
+				'No ApplicationContext found in first two arguments '
+				'of function decorated with @player_check'
+			)
+		
+		player: Player | None = database.get_player(args[idx].author.id)
 		if not player:
-			await ctx.respond(
+			await args[idx].respond(
 				embed=embeds.simple_embed(
 					'❌ You do not own a burger joint!',
 					'Use the `/start` command to '
@@ -45,7 +48,7 @@ def player_check(func):
 			)
 			return None
 		
-		args[0].player = player
+		args[idx].player = player
 		result = await func(*args, **kwargs)
 		database.save_data(player)
 		return result
@@ -66,14 +69,14 @@ async def start(ctx: ApplicationContext):
 		await ctx.respond(
 			embed=embeds.simple_embed(
 				description_text='✅ You have successfully established '
-				'your very own burger joint!'
+				                 'your very own burger joint!'
 			)
 		)
 	else:
 		await ctx.respond(
 			embed=embeds.simple_embed(
 				description_text=f'🍔 {player.username} already owns '
-				f'a burger joint called "{player.shop_name}".',
+				                 f'a burger joint called "{player.shop_name}".',
 				embed_color=discord.Color.yellow()
 			)
 		)
@@ -105,7 +108,8 @@ async def rename(ctx: ApplicationContext, new_name: str):
 			description_text=f'✅ Changed burger joint name to: "{player.shop_name}"!'
 		)
 	)
-	await player.unlock_badge(BadgeID.RENAME_SHACK, ctx)
+	await player.unlock_badge(BadgeID.RENAME_JOINT, ctx)
+
 
 @bot.slash_command(description='')
 @player_check
