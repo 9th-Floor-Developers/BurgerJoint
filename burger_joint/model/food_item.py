@@ -8,6 +8,8 @@ class FoodItem:
 	difficulty: int 
 	category: FoodCategoryID
 
+"""Represents a food item on a player's menu. may have different name, price, 
+and prestige level than the base FoodItem depending on the joint"""
 @dataclass
 class MenuItem:
 	food_item: FoodItem
