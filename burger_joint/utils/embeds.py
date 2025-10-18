@@ -93,6 +93,29 @@ def leaderboard_embed(
 	return embed
 
 
+def menu_embed(player: Player) -> Embed:
+	embed = Embed(
+		title=f"🍔 {player.shop_name}'s Menu:",
+		color=Color.lighter_grey()
+	)
+	
+	menu_item_categories: set[FoodCategoryID] = {
+		ALL_FOOD_ITEMS[item.item_id].category
+		for item in player.menu_items
+	}
+	
+	for category in menu_item_categories:
+		items_text = "\n".join(
+			f"{item.name} — ${item.price}"
+				for item in player.menu_items
+				if ALL_FOOD_ITEMS[item.item_id].category == category
+		)
+		
+		embed.add_field(name=category.value, value=items_text, inline=False)
+	
+	return embed
+
+
 def blackjack_embed(
 	player_cards: list[Card],
 	dealer_cards: list[Card],
