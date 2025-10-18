@@ -180,4 +180,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
-data.json
+burger_joint/assets/data.json
