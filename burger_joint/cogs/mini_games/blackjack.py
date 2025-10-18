@@ -4,6 +4,7 @@ from typing import override
 import discord
 from discord import ApplicationContext, Interaction, Message
 from discord.ui import Button, View
+from burger_joint.utils import ChoiceButtons
 
 
 class Card:
@@ -37,26 +38,6 @@ class Deck:
 		if not self.cards:
 			self.__init__()
 		return self.cards.pop()
-
-
-class ChoiceButtons(View):
-	def __init__(self, buttons: dict[str, int]):
-		super().__init__()
-		self.value = None
-		for label, style in buttons.items():
-			self.add_item(
-				Button(
-					label=label,
-					style=style,  # type: ignore
-					custom_id=label
-				)
-			)
-	
-	@override
-	async def interaction_check(self, interaction: Interaction) -> bool:
-		self.value = interaction.data["custom_id"].lower().split()[1]
-		self.stop()
-		return True
 
 
 class BlackJack:
@@ -103,7 +84,8 @@ class BlackJack:
 			{
 				'🔄️ Replay': discord.ButtonStyle.green,
 				'💸 Cash Out': discord.ButtonStyle.red
-			}
+			},
+			user_id=self.user_id
 		)
 		
 		if p_val == 21 and d_val != 21:
@@ -118,7 +100,8 @@ class BlackJack:
 				{
 					'➕ Hit': discord.ButtonStyle.green,
 					'🛑 Stand': discord.ButtonStyle.red
-				}
+				},
+				user_id=self.user_id
 			)
 			await self.message.edit(
 				embed=blackjack_embed(
@@ -172,6 +155,8 @@ class BlackJack:
 	) -> int:
 		from utils import embeds
 		
+		self.user_id = ctx.author.id
+
 		response = await ctx.respond(
 			embed=embeds.simple_embed('Starting blackjack...')
 		)
