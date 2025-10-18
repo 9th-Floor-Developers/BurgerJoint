@@ -7,7 +7,7 @@ from burger_joint.model import FoodItem
 from discord import Embed, Message, Color
 
         
-class WorkSytem(Cog):
+class WorkCommands(Cog):
     @slash_command(description="Work to earn money and XP")
     @player_check
     async def work(self, ctx: ApplicationContext):
@@ -77,4 +77,4 @@ class WorkSession:
 
 		
 def setup(bot: Bot):
-	bot.add_cog(WorkSytem(bot))
+	bot.add_cog(WorkCommands(bot))
