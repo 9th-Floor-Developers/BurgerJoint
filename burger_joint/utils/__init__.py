@@ -1,5 +1,5 @@
 from .constants import ALL_BADGES, ALL_FOOD_ITEMS, STARTING_MENU
-from .enums import BadgeID, FoodItemID
+from .enums import BadgeID, FoodItemID, FoodCategoryID
 from .inputs import ChoiceButtons
 
 __all__ = [
@@ -8,5 +8,6 @@ __all__ = [
 	'ALL_FOOD_ITEMS',
 	'STARTING_MENU',
 	'BadgeID',
-    'FoodItemID'
+    'FoodItemID',
+    'FoodCategoryID'
 ]

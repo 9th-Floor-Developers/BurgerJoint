@@ -23,11 +23,11 @@ ALL_BADGES: dict[BadgeID, Badge] = {
 }
 
 ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
-	FoodItemID.CLASSIC_BURGER: FoodItem(FoodItemID.CLASSIC_BURGER.value, 12, 1, FoodCategoryID.BURGER),
-	FoodItemID.FRIES: FoodItem(FoodItemID.FRIES.value, 4, 1, FoodCategoryID.SNACK),
-	FoodItemID.SODA: FoodItem(FoodItemID.SODA.value, 2, 1, FoodCategoryID.DRINK),
-	FoodItemID.VEGGIE_BURGER: FoodItem(FoodItemID.VEGGIE_BURGER.value, 14, 2, FoodCategoryID.BURGER),
-	FoodItemID.CHICKEN_SANDWICH: FoodItem(FoodItemID.CHICKEN_SANDWICH.value, 11, 2, FoodCategoryID.BURGER)
+	FoodItemID.CLASSIC_BURGER: FoodItem(FoodItemID.CLASSIC_BURGER.value, 12, 1, FoodCategoryID.BURGERS),
+	FoodItemID.FRIES: FoodItem(FoodItemID.FRIES.value, 4, 1, FoodCategoryID.SNACKS),
+	FoodItemID.SODA: FoodItem(FoodItemID.SODA.value, 2, 1, FoodCategoryID.DRINKS),
+	FoodItemID.VEGGIE_BURGER: FoodItem(FoodItemID.VEGGIE_BURGER.value, 14, 2, FoodCategoryID.BURGERS),
+	FoodItemID.CHICKEN_SANDWICH: FoodItem(FoodItemID.CHICKEN_SANDWICH.value, 11, 2, FoodCategoryID.BURGERS)
 }
 
 STARTING_MENU: list[FoodItemID] = [

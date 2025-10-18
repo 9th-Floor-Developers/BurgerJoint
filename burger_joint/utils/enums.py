@@ -26,6 +26,6 @@ class FoodItemID(Enum):
 
 
 class FoodCategoryID(Enum):
-	BURGER = 'Burger'
-	SNACK = 'Snack'
-	DRINK = 'Drink'
+	BURGERS = 'Burgers'
+	SNACKS = 'Snacks'
+	DRINKS = 'Drinks'
