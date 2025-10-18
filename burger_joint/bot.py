@@ -1,12 +1,10 @@
 """Bot initialization, event loop, command loader"""
 import functools
 
-import discord
-from discord import ApplicationContext, Bot, Intents
+from discord import ApplicationContext, Bot, Color, Intents
 
 from burger_joint.model import Player
-from burger_joint.utils import database
-from burger_joint.utils import BadgeID
+from burger_joint.utils import BadgeID, database
 from utils import embeds
 
 bot = Bot(intents=Intents.all())
@@ -45,7 +43,7 @@ def player_check(func):
 					'❌ You do not own a burger joint!',
 					'Use the `/start` command to '
 					'start your very own burger joint!',
-					discord.Color.red()
+					Color.red()
 				)
 			)
 			return None
@@ -79,7 +77,7 @@ async def start(ctx: ApplicationContext):
 			embed=embeds.simple_embed(
 				description_text=f'🍔 {player.username} already owns '
 				                 f'a burger joint called "{player.shop_name}".',
-				embed_color=discord.Color.yellow()
+				embed_color=Color.yellow()
 			)
 		)
 

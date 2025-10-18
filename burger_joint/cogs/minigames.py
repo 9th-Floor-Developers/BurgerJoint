@@ -1,8 +1,7 @@
 import functools
 import random
 
-import discord
-from discord import ApplicationContext, Bot, Cog, Option
+from discord import ApplicationContext, Bot, Cog, Color, Option, slash_command
 
 from bot import player_check
 from burger_joint.cogs.mini_games.blackjack import BlackJack
@@ -19,7 +18,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 				await ctx.respond(
 					embed=embeds.simple_embed(
 						description_text='🏦 You do not have any money.',
-						embed_color=discord.Color.red()
+						embed_color=Color.red()
 					)
 				)
 				return
@@ -27,7 +26,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 				await ctx.respond(
 					embed=embeds.simple_embed(
 						description_text=f'💵 You need at least ${needed} (${needed - player.balance} more).',
-						embed_color=discord.Color.red()
+						embed_color=Color.red()
 					)
 				)
 				return
@@ -38,7 +37,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 					await ctx.respond(
 						embed=embeds.simple_embed(
 							description_text=f'💰 You cannot spend more than you have',
-							embed_color=discord.Color.red()
+							embed_color=Color.red()
 						)
 					)
 					return
@@ -46,7 +45,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 					await ctx.respond(
 						embed=embeds.simple_embed(
 							description_text=f'💰 You cannot bet a negative number.',
-							embed_color=discord.Color.red()
+							embed_color=Color.red()
 						)
 					)
 					return
@@ -62,7 +61,7 @@ class MiniGames(Cog):
 	def __init__(self, bot):
 		self.bot = bot
 	
-	@discord.slash_command(description='')
+	@slash_command(description='')
 	@player_check
 	@cost_check(extra=True)
 	async def blackjack(self, ctx: ApplicationContext, bet: int) -> None:
@@ -77,7 +76,7 @@ class MiniGames(Cog):
 			)
 		)
 	
-	@discord.slash_command(description='')
+	@slash_command(description='')
 	@player_check
 	@cost_check(extra=True)
 	async def coinflip(
@@ -107,7 +106,7 @@ class MiniGames(Cog):
 				embed=embeds.simple_embed(
 					title_text=f'📉 {result}... You lost ${bet}',
 					description_text=f'New balance: ${player.balance}',
-					embed_color=discord.Color.red()
+					embed_color=Color.red()
 				)
 			)
 

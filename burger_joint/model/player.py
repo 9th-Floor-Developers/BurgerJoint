@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 from discord import ApplicationContext
 
-from burger_joint.model.upgrades import Employee, Upgrade
-from burger_joint.utils import BadgeID, ALL_BADGES
 from burger_joint.model.food_item import MenuItem
+from burger_joint.model.upgrades import Employee, Upgrade
+from burger_joint.utils import ALL_BADGES, BadgeID
 
 
 @dataclass
@@ -21,9 +21,6 @@ class Player:
 	badges: set[BadgeID]
 	menu_items: list[MenuItem]
 	prestige: int
-	
-	def __post_init__(self):
-		pass  # any calculations after init if necessary
 	
 	async def unlock_badge(
 		self,

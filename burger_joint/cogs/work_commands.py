@@ -1,12 +1,14 @@
 import random
-from discord import ApplicationContext, Bot, Cog, slash_command
-from discord.ext import tasks
-from burger_joint.bot import player_check
-from burger_joint.utils import FoodItemID, database, ALL_FOOD_ITEMS
-from burger_joint.model import FoodItem
-from discord import Embed, Message, Color
 
-        
+from discord import ApplicationContext, Bot, Cog, Color, Embed, Message, \
+	slash_command
+from discord.ext import tasks
+
+from burger_joint.bot import player_check
+from burger_joint.model import FoodItem
+from burger_joint.utils import ALL_FOOD_ITEMS, database
+
+
 class WorkCommands(Cog):
 	@slash_command(description="Work to earn money and XP")
 	@player_check

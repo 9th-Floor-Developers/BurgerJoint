@@ -1,12 +1,11 @@
 """Display various information as embeds."""
 
-import discord
 from discord import Color, Embed
 
 from burger_joint.cogs.mini_games.blackjack import Card
 from burger_joint.model import Player
-from burger_joint.utils.constants import ALL_BADGES
-from burger_joint.utils.enums import LeaderboardID
+from burger_joint.utils.constants import ALL_BADGES, ALL_FOOD_ITEMS
+from burger_joint.utils.enums import FoodCategoryID, LeaderboardID
 
 
 def simple_embed(
@@ -26,9 +25,9 @@ def status_embed(player: Player) -> Embed:
 	
 	embed = Embed(
 		title=f"🍔 {player.shop_name} Status:",
-		color=discord.Color.green()
 		description=f"🏆 Level: {player.level} | ✨ XP: {player.xp} | "
 		            f"💰 Balance: ${player.balance}",
+		color=Color.green()
 	)
 	
 	embed.add_field(
@@ -79,7 +78,7 @@ def leaderboard_embed(
 ) -> Embed:
 	embed = Embed(
 		title=f"🍔 {leaderboard_type.value[0]} Leaderboard 🍔",
-		color=discord.Color.purple()
+		color=Color.purple()
 	)
 	
 	for i, player in enumerate(players):
@@ -101,7 +100,7 @@ def blackjack_embed(
 ) -> Embed:
 	embed = Embed(
 		title=f'♣️ Blackjack ♦️',
-		color=discord.Color.red()
+		color=Color.red()
 	)
 	
 	embed.add_field(

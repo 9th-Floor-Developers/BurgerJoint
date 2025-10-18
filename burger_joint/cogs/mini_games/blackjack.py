@@ -1,9 +1,8 @@
 import random
 from typing import override
 
-import discord
-from discord import ApplicationContext, Interaction, Message
-from discord.ui import Button, View
+from discord import ApplicationContext, ButtonStyle, Message
+
 from burger_joint.utils import ChoiceButtons
 
 
@@ -46,6 +45,7 @@ class BlackJack:
 		self.player_cards: list[Card] = [self.deck.draw(), self.deck.draw()]
 		self.dealer_cards: list[Card] = [self.deck.draw()]
 		self.secret_card: Card = self.deck.draw()
+		self.user_id: int | None = None
 		self.message: Message | None = None
 		self.buttons: ChoiceButtons | None = None
 	
@@ -82,8 +82,8 @@ class BlackJack:
 		)
 		self.buttons = ChoiceButtons(
 			{
-				'🔄️ Replay': discord.ButtonStyle.green,
-				'💸 Cash Out': discord.ButtonStyle.red
+				'🔄️ Replay': ButtonStyle.green,
+				'💸 Cash Out': ButtonStyle.red
 			},
 			user_id=self.user_id
 		)
@@ -98,8 +98,8 @@ class BlackJack:
 		while p_val < 21:
 			buttons = ChoiceButtons(
 				{
-					'➕ Hit': discord.ButtonStyle.green,
-					'🛑 Stand': discord.ButtonStyle.red
+					'➕ Hit': ButtonStyle.green,
+					'🛑 Stand': ButtonStyle.red
 				},
 				user_id=self.user_id
 			)
