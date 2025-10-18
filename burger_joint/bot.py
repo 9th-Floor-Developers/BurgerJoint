@@ -16,6 +16,7 @@ def setup() -> Bot:
 	all_cogs = [
 		'leaderboards',
 		'work_commands',
+		'minigames'
 	]
 	for cog in all_cogs:
 		bot.load_extension(f'cogs.{cog}')

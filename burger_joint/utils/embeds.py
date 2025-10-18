@@ -93,3 +93,34 @@ def leaderboard_embed(
 		)
 	
 	return embed
+
+
+def blackjack_embed(
+	player_cards: list[Card],
+	dealer_cards: list[Card],
+	value_func
+) -> Embed:
+	embed = Embed(
+		title=f'♣️ Blackjack ♦️',
+		color=discord.Color.red()
+	)
+	
+	embed.add_field(
+		name='Your Cards:',
+		value=' '.join(str(c) for c in player_cards)
+	).add_field(
+		name='Dealer Cards:',
+		value=' '.join(str(c) for c in dealer_cards)
+	)
+	
+	embed.add_field(name='-------------------------', value='', inline=False)
+	
+	embed.add_field(
+		name=f'Total: {value_func(player_cards)}',
+		value=''
+	).add_field(
+		name=f'Total: {value_func(dealer_cards)}',
+		value=''
+	)
+	
+	return embed
