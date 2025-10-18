@@ -47,7 +47,7 @@ class ChoiceButtons(View):
 			self.add_item(
 				Button(
 					label=label,
-					style=style,
+					style=style,  # type: ignore
 					custom_id=label
 				)
 			)
@@ -108,7 +108,7 @@ class BlackJack:
 		
 		if p_val == 21 and d_val != 21:
 			await self.update_embed('🎉 You Win!', 'You have blackjack!')
-			return int(1.5 * bet)
+			return int(.5 * bet)
 		elif d_val == 21:
 			await self.update_embed('❌ You Lose...', 'Dealer has blackjack!')
 			return 0
@@ -147,14 +147,14 @@ class BlackJack:
 		d_val = self.hand_value(self.dealer_cards)
 		
 		if d_val > 21:
-			msg, res = ('🎉 You Win!', 'Dealer has over 21!'), int(1.5 * bet)
+			msg, res = ('🎉 You Win!', 'Dealer has over 21!'), int(.5 * bet)
 		elif d_val == 21:
 			msg, res = ('❌ You Lose...', 'Dealer has blackjack!'), 0
 		elif p_val == 21:
-			msg, res = ('🎉 You Win!', 'You have blackjack!'), int(1.5 * bet)
+			msg, res = ('🎉 You Win!', 'You have blackjack!'), int(.5 * bet)
 		elif p_val > d_val:
-			msg, res = ('🎉 You Win!', 'You have higher than the dealer!'), int(
-				1.5 * bet
+			msg, res = (('🎉 You Win!', 'You have higher than the dealer!'),
+				int(.5 * bet)
 			)
 		elif p_val < d_val:
 			msg, res = ('❌ You Lose...', 'Dealer has higher than you!'), 0

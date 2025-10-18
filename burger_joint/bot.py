@@ -86,13 +86,13 @@ async def start(ctx: ApplicationContext):
 @bot.slash_command(description="Display your joint's status.")
 @player_check
 async def status(ctx: ApplicationContext):
-	await ctx.respond(embed=embeds.status_embed(ctx.player))
+	await ctx.respond(embed=embeds.status_embed(ctx.player))  # type: ignore
 
 
 @bot.slash_command(description='Rename your burger joint.')
 @player_check
 async def rename(ctx: ApplicationContext, new_name: str):
-	player: Player = ctx.player
+	player: Player = ctx.player  # type: ignore
 	
 	if player.shop_name == new_name:
 		await ctx.respond(
@@ -115,4 +115,4 @@ async def rename(ctx: ApplicationContext, new_name: str):
 @bot.slash_command(description='')
 @player_check
 async def badges(ctx: ApplicationContext):
-	await ctx.respond(embed=embeds.badges_embed(ctx.player))
+	await ctx.respond(embed=embeds.badges_embed(ctx.player))  # type: ignore

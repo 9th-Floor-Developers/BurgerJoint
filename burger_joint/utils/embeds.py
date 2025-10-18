@@ -1,7 +1,7 @@
 """Display various information as embeds."""
 
 import discord
-from discord import Color, Embed, User
+from discord import Color, Embed
 
 from burger_joint.cogs.mini_games.blackjack import Card
 from burger_joint.model import Player
