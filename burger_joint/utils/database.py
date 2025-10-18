@@ -42,10 +42,12 @@ def get_player(id: int) -> Player | None:
 					for badge in player.badges
 				}
 				
-				player.menu_items = {
-					FoodItemID(item)
-					for item in player.menu_items
-				}
+				
+				#player.menu_items = {
+				#	FoodItemID(item)
+				#	for item in player.menu_items
+				#}
+
 				
 				return player
 	return None

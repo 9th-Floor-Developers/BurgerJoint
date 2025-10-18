@@ -8,5 +8,9 @@ class FoodItem:
 	difficulty: int 
 	category: FoodCategoryID
 
-
-    
+@dataclass
+class MenuItem:
+	food_item: FoodItem
+	name: str
+	price: str
+	prestige: int 

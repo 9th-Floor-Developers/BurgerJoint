@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from discord import ApplicationContext
 
 from burger_joint.model.upgrades import Employee, Upgrade
-from burger_joint.utils.constants import ALL_BADGES
-from burger_joint.utils import BadgeID, FoodItemID
+from burger_joint.utils import BadgeID, ALL_BADGES
+from burger_joint.model.food_item import MenuItem
 
 
 @dataclass
@@ -19,7 +19,7 @@ class Player:
 	upgrades: list[Upgrade]
 	employees: list[Employee]
 	badges: set[BadgeID]
-	menu_items: set[FoodItemID]
+	menu_items: list[MenuItem]
 	prestige: int
 	
 	def __post_init__(self):
