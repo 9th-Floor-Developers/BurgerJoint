@@ -26,10 +26,9 @@ def status_embed(player: Player) -> Embed:
 	
 	embed = Embed(
 		title=f"🍔 {player.shop_name} Status:",
-		description=
-		f"🏆 Level: {player.level} | ✨ XP: {player.xp} | 💰 Balance: ${player.balance}"
-		,
 		color=discord.Color.green()
+		description=f"🏆 Level: {player.level} | ✨ XP: {player.xp} | "
+		            f"💰 Balance: ${player.balance}",
 	)
 	
 	embed.add_field(

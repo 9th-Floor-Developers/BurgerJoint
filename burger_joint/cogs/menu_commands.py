@@ -8,15 +8,13 @@ from burger_joint.model import FoodItem, MenuItem, Player
 from discord import Embed, Message, Color
 
 class MenuCommands(Cog):
-    @slash_command(description="View and edit you joint's menu")
-    @player_check
-    async def menu(self, ctx: ApplicationContext):
-        await ctx.respond(embed=menu_embed(ctx.player), view=MenuView())
-
-def menu_embed(player : Player) -> Embed:
-    embed = Embed(title=f"🍔 {player.shop_name} Menu:", color=Color.lighter_grey())
-
-    menu_item_categories : set[FoodCategoryID] = {ALL_FOOD_ITEMS[item.food_item_ID].category for item in player.menu_items}
+	@slash_command(description="View and edit you joint's menu")
+	@player_check
+	async def menu(self, ctx: ApplicationContext):
+		await ctx.respond(
+			embed=embeds.menu_embed(ctx.player), view=MenuView()
+			# type: ignore
+		)
 
 
     for category in menu_item_categories:
@@ -41,6 +39,7 @@ class MenuView(discord.ui.View):
     @discord.ui.button(label="Edit Item", style=discord.ButtonStyle.primary) 
     async def edit_item_button_callback(self, button, interaction):
         await interaction.response.send_message("You clicked the button3!")
+
 
 def setup(bot: Bot):
 	bot.add_cog(MenuCommands(bot))
