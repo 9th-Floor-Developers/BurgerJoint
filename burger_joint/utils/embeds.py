@@ -24,23 +24,23 @@ def status_embed(player: Player) -> Embed:
 	"""Returns an embed displaying the player's stats with emojis."""
 	
 	embed = Embed(
-		title=f"🍔 {player.shop_name} Status:",
-		description=f"🏆 Level: {player.level} | ✨ XP: {player.xp} | "
-		            f"💰 Balance: ${player.balance}",
+		title=f'🍔 {player.shop_name} Status:',
+		description=f'🏆 Level: {player.level} | ✨ XP: {player.xp} | '
+		            f'💰 Balance: ${player.balance}',
 		color=Color.green()
 	)
 	
 	embed.add_field(
-		name="💵 Burgers Sold",
+		name='💵 Burgers Sold',
 		value=str(player.burgers_sold)
 	).add_field(
-		name="🛠️ Upgrades",
+		name='🛠️ Upgrades',
 		value=str(len(player.upgrades))
 	).add_field(
-		name="👨‍🍳 Employees",
+		name='👨‍🍳 Employees',
 		value=str(len(player.employees))
 	).set_footer(
-		text=f"⭐ Prestige Level: {player.prestige}"
+		text=f'⭐ Prestige Level: {player.prestige}'
 	)
 	
 	return embed
@@ -77,16 +77,16 @@ def leaderboard_embed(
 	leaderboard_type: LeaderboardID
 ) -> Embed:
 	embed = Embed(
-		title=f"🍔 {leaderboard_type.value[0]} Leaderboard 🍔",
+		title=f'🍔 {leaderboard_type.value[0]} Leaderboard 🍔',
 		color=Color.purple()
 	)
 	
 	for i, player in enumerate(players):
 		embed.add_field(
-			name=f"{i + 1}. {player.shop_name} - "
-			     f"{getattr(player, leaderboard_type.value[1])} "
-			     f"{leaderboard_type.value[0]}",
-			value="",
+			name=f'{i + 1}. {player.shop_name} - '
+			     f'{getattr(player, leaderboard_type.value[1])} '
+			     f'{leaderboard_type.value[0]}',
+			value='',
 			inline=False
 		)
 	
@@ -95,7 +95,9 @@ def leaderboard_embed(
 
 def menu_embed(player: Player) -> Embed:
 	embed = Embed(
-		title=f"🍔 {player.shop_name}'s Menu:",
+		title=f'🍔 {player.shop_name}'
+	s
+	Menu: ',
 		color=Color.lighter_grey()
 	)
 	
@@ -105,8 +107,8 @@ def menu_embed(player: Player) -> Embed:
 	}
 	
 	for category in menu_item_categories:
-		items_text = "\n".join(
-			f"{item.name} — ${item.price}"
+		items_text = '\n'.join(
+			f'{item.name} — ${item.price}'
 				for item in player.menu_items
 				if ALL_FOOD_ITEMS[item.item_id].category == category
 		)

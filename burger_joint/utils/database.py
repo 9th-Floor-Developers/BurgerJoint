@@ -21,7 +21,7 @@ def json_path() -> str:
 def create_new_player(user: User):
 	player = Player(
 		user_id=user.id, username=user.name,
-		shop_name=f"{user.name}'s Burger Joint",
+		shop_name=f'{user.name}\'s Burger Joint',
 		balance=100, level=1, xp=0, burgers_sold=0, prestige=0,
 		upgrades=[], employees=[], badges=set(), menu_items=STARTING_MENU
 	)
@@ -70,7 +70,7 @@ def json_convert(obj: Any):
 		return obj.value
 	if isinstance(obj, set):
 		return list(obj)
-	if hasattr(obj, "__dict__"):
+	if hasattr(obj, '__dict__'):
 		return obj.__dict__
 	return obj
 

@@ -76,13 +76,18 @@ async def start(ctx: ApplicationContext):
 		await ctx.respond(
 			embed=embeds.simple_embed(
 				description_text=f'🍔 {player.username} already owns '
-				                 f'a burger joint called "{player.shop_name}".',
+				                 f'a burger joint called '
+		{player.shop_name}
+		'.',
 				embed_color=Color.yellow()
 			)
 		)
-
-
-@bot.slash_command(description="Display your joint's status.")
+	
+	@bot.slash_command(description='Display your joint'
+	
+	s
+	status.
+	')
 @player_check
 async def status(ctx: ApplicationContext):
 	await ctx.respond(embed=embeds.status_embed(ctx.player))  # type: ignore
@@ -105,7 +110,9 @@ async def rename(ctx: ApplicationContext, new_name: str):
 	player.shop_name = new_name
 	await ctx.respond(
 		embed=embeds.simple_embed(
-			description_text=f'✅ Changed burger joint name to: "{player.shop_name}"!'
+			description_text=f'✅ Changed burger joint name to: '
+	{player.shop_name}
+	'!'
 		)
 	)
 	await player.unlock_badge(BadgeID.RENAME_JOINT, ctx)
