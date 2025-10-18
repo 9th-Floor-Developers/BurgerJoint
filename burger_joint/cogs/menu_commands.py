@@ -1,5 +1,6 @@
 import random
 from discord import ApplicationContext, Bot, Cog, slash_command, SlashCommandGroup
+import discord
 from discord.ext import tasks
 from burger_joint.bot import player_check
 from burger_joint.utils import FoodItemID, FoodCategoryID, database, ALL_FOOD_ITEMS
@@ -10,7 +11,7 @@ class MenuCommands(Cog):
     @slash_command(description="View and edit you joint's menu")
     @player_check
     async def menu(self, ctx: ApplicationContext):
-        await ctx.respond(embed=menu_embed(ctx.player))
+        await ctx.respond(embed=menu_embed(ctx.player), view=MenuView())
 
 def menu_embed(player : Player) -> Embed:
     embed = Embed(title=f"🍔 {player.shop_name} Menu:", color=Color.lighter_grey())
@@ -28,6 +29,18 @@ def menu_embed(player : Player) -> Embed:
 
     return embed
           
+class MenuView(discord.ui.View):
+    @discord.ui.button(label="Add Item", style=discord.ButtonStyle.success) 
+    async def add_item_button_callback(self, button, interaction):
+        await interaction.response.send_message("You clicked the button1!")
+
+    @discord.ui.button(label="Remove Item", style=discord.ButtonStyle.red) 
+    async def remove_item_button_callback(self, button, interaction):
+        await interaction.response.send_message("You clicked the button2!")
+
+    @discord.ui.button(label="Edit Item", style=discord.ButtonStyle.primary) 
+    async def edit_item_button_callback(self, button, interaction):
+        await interaction.response.send_message("You clicked the button3!")
 
 def setup(bot: Bot):
 	bot.add_cog(MenuCommands(bot))
