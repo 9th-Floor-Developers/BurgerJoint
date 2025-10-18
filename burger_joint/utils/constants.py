@@ -2,9 +2,10 @@ from burger_joint.model.badge import Badge
 from burger_joint.model.food_item import FoodItem, MenuItem
 from burger_joint.utils.enums import BadgeID, FoodItemID, FoodCategoryID
 
-def get_default_menu_item(food_item : FoodItem) -> MenuItem:
+def get_default_menu_item(food_item_ID : FoodItemID) -> MenuItem:
+	food_item : FoodItem = ALL_FOOD_ITEMS[food_item_ID]
 	return MenuItem(
-		food_item = food_item,
+		food_item_ID = food_item_ID,
 		name = food_item.name,
 		price = food_item.price,
 		prestige = 0
@@ -30,7 +31,7 @@ ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
 }
 
 STARTING_MENU: list[FoodItemID] = [
-	get_default_menu_item(ALL_FOOD_ITEMS[FoodItemID.CLASSIC_BURGER]),
-	get_default_menu_item(ALL_FOOD_ITEMS[FoodItemID.FRIES]),
-	get_default_menu_item(ALL_FOOD_ITEMS[FoodItemID.SODA])
+	get_default_menu_item(FoodItemID.CLASSIC_BURGER),
+	get_default_menu_item(FoodItemID.FRIES),
+	get_default_menu_item(FoodItemID.SODA)
 ]

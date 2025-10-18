@@ -38,12 +38,12 @@ class WorkSession:
         self.ordered_items.append(menu_item)
         self.money_earned += menu_item.price
 
-        await self.message_display.edit(embed=await self.get_display_embed())
+        await self.message_display.edit(embed=await self.work_session_embed())
 
 
     @updater.before_loop
     async def start_session(self):
-        self.message_display : Message = await self.ctx.respond(embed=await self.get_display_embed())
+        self.message_display : Message = await self.ctx.respond(embed=await self.work_session_embed())
 
 
     @updater.after_loop
@@ -51,9 +51,9 @@ class WorkSession:
         self.ctx.player.balance += self.money_earned
         database.save_data(self.ctx.player)
         
-        await self.message_display.edit(embed=await self.get_display_embed(True))
+        await self.message_display.edit(embed=await self.work_session_embed(True))
 
-    async def get_display_embed(self, is_finnish : bool = False) -> Embed:
+    async def work_session_embed(self, is_finnish : bool = False) -> Embed:
         if self.counter < 5:
             return Embed(title="Work Session Starting...", description="Geting ready to serve some customers!", color=Color.yellow())
         if len(self.ordered_items) == 0:

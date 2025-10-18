@@ -6,8 +6,8 @@ from typing import Any
 
 from discord import User
 
-from burger_joint.model.player import Player
-from burger_joint.utils import BadgeID, STARTING_MENU
+from burger_joint.model import Player, FoodItem, MenuItem
+from burger_joint.utils import BadgeID, FoodItemID, STARTING_MENU
 
 
 def json_path() -> str:
@@ -42,6 +42,14 @@ def get_player(id: int) -> Player | None:
 					for badge in player.badges
 				}
 
+				player.menu_items = [
+					MenuItem(**menu_item)
+					for menu_item in player.menu_items
+				]
+
+				for menu_item in player.menu_items:
+					menu_item.food_item_ID = FoodItemID(menu_item.food_item_ID)
+					
 				return player
 	return None
 
