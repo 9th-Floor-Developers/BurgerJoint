@@ -31,6 +31,6 @@ class ChoiceButtons(View):
 			return True
 		
 		await interaction.response.defer()
-		self.value = interaction.data['custom_id'].lower().split()[1]
+		self.value = interaction.data["custom_id"].lower().split()[1]
 		self.stop()
 		return True

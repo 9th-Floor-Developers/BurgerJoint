@@ -10,10 +10,10 @@ from burger_joint.utils import ALL_FOOD_ITEMS, database
 
 
 class WorkCommands(Cog):
-	@slash_command(description='Work to earn money and XP')
+	@slash_command(description="Work to earn money and XP")
 	@player_check
 	async def work(self, ctx: ApplicationContext):
-		await ctx.respond('Starting Work Session...')
+		await ctx.respond("Starting Work Session...")
 		WorkSession(ctx)
 
 
@@ -62,34 +62,34 @@ class WorkSession:
 	async def work_session_embed(self, is_finished: bool = False) -> Embed:
 		if self.counter < 5:
 			return Embed(
-				title='Work Session Starting...',
-				description='Getting ready to serve some customers!',
+				title="Work Session Starting...",
+				description="Getting ready to serve some customers!",
 				color=Color.yellow()
 			)
 		if not self.ordered_items:
 			return Embed(
-				title='Work Session In Progress',
-				description='No items served yet...', color=Color.yellow()
+				title="Work Session In Progress",
+				description="No items served yet...", color=Color.yellow()
 			)
 		
-		items_text = '\n'.join(
-			f'{i + 1}. {item.name} — ${item.price}'
+		items_text = "\n".join(
+			f"{i + 1}. {item.name} — ${item.price}"
 				for i, item in enumerate(self.ordered_items)
 		)
 		
 		if is_finished:
-			embed = Embed(title='Work Session Finished!', color=Color.green())
+			embed = Embed(title="Work Session Finished!", color=Color.green())
 		else:
 			embed = Embed(
-				title='Work Session In Progress', color=Color.green()
+				title="Work Session In Progress", color=Color.green()
 			)
 		
-		embed.add_field(name='Served Items', value=items_text, inline=False)
+		embed.add_field(name="Served Items", value=items_text, inline=False)
 		embed.add_field(
-			name='Total Items', value=str(len(self.ordered_items)), inline=True
+			name="Total Items", value=str(len(self.ordered_items)), inline=True
 		)
 		embed.add_field(
-			name='Money Earned', value=f'${self.money_earned}', inline=True
+			name="Money Earned", value=f"${self.money_earned}", inline=True
 		)
 		return embed
 
