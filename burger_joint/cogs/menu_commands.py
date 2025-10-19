@@ -32,7 +32,7 @@ def menu_embed(player : Player) -> Embed:
 class MenuView(discord.ui.View):
     @discord.ui.button(label="Add Item", style=discord.ButtonStyle.success) 
     async def add_item_button_callback(self, button, interaction):
-        await interaction.response.send_message("You clicked the button1!")
+        await interaction.response.send_message(view=SelectFoodItemView())
 
     @discord.ui.button(label="Remove Item", style=discord.ButtonStyle.red) 
     async def remove_item_button_callback(self, button, interaction):
@@ -41,6 +41,23 @@ class MenuView(discord.ui.View):
     @discord.ui.button(label="Edit Item", style=discord.ButtonStyle.primary) 
     async def edit_item_button_callback(self, button, interaction):
         await interaction.response.send_message("You clicked the button3!")
+
+class SelectFoodItemView(discord.ui.View):
+    @discord.ui.select( 
+        placeholder = "Choose a Flavor!",
+        min_values = 1,
+        max_values = 1, 
+        options = [ 
+            discord.SelectOption(
+                label=food_item.name,
+                description=f"Pick this if you like {food_item.name}!"
+            )
+            for food_item in ALL_FOOD_ITEMS
+        ]
+    )
+    async def select_callback(self, select, interaction): # the function called when the user is done selecting options
+        await interaction.response.send_message(f"Awesome! I like {select.values[0]} too!")
+
 
 def setup(bot: Bot):
 	bot.add_cog(MenuCommands(bot))
