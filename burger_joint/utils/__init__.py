@@ -3,5 +3,5 @@ from .modals import SettingAddedMenuItemModal
 
 __all__ = [
     'ChoiceButtons',
-    'SettingAddedMenuItemModal'
+    'SettingAddedMenuItemModal',
 ]

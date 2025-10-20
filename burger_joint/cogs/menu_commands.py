@@ -66,8 +66,9 @@ class SelectAllFoodItemView(discord.ui.View):
         ]
     )
     async def select_callback(self, select, interaction):
+        #await interaction.response.send_modal(TestModal())
         await interaction.response.send_modal(SettingAddedMenuItemModal(
-            self.player, FoodItemID(select.values[0]), ALL_FOOD_ITEMS[FoodItemID(select.values[0])]))
+            self.player, FoodItemID(select.values[0])))
 
 
 def setup(bot: Bot):
