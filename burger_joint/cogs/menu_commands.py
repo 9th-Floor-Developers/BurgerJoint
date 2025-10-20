@@ -3,7 +3,7 @@ from discord import ApplicationContext, Bot, Cog, slash_command, SlashCommandGro
 import discord
 from discord.ext import tasks
 from burger_joint.bot import player_check
-from burger_joint.utils import FoodItemID, FoodCategoryID, database, ALL_FOOD_ITEMS
+from burger_joint.utils import FoodItemID, FoodCategoryID, database, ALL_FOOD_ITEMS, SettingAddedMenuItemModal
 from burger_joint.model import FoodItem, MenuItem, Player
 from discord import Embed, Message, Color
 
@@ -11,7 +11,7 @@ class MenuCommands(Cog):
     @slash_command(description="View and edit you joint's menu")
     @player_check
     async def menu(self, ctx: ApplicationContext):
-        await ctx.respond(embed=menu_embed(ctx.player), view=MenuView())
+        await ctx.respond(embed=menu_embed(ctx.player), view=MenuView(player=ctx.player))
 
 def menu_embed(player : Player) -> Embed:
     embed = Embed(title=f"🍔 {player.shop_name} Menu:", color=Color.lighter_grey())
@@ -30,9 +30,13 @@ def menu_embed(player : Player) -> Embed:
     return embed
           
 class MenuView(discord.ui.View):
+    def __init__(self, *items, timeout = 180, disable_on_timeout = False, player: Player):
+        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
+        self.player = player
+
     @discord.ui.button(label="Add Item", style=discord.ButtonStyle.success) 
     async def add_item_button_callback(self, button, interaction):
-        await interaction.response.send_message(view=SelectFoodItemView())
+        await interaction.response.send_message(view=SelectAllFoodItemView(player=self.player))
 
     @discord.ui.button(label="Remove Item", style=discord.ButtonStyle.red) 
     async def remove_item_button_callback(self, button, interaction):
@@ -42,21 +46,28 @@ class MenuView(discord.ui.View):
     async def edit_item_button_callback(self, button, interaction):
         await interaction.response.send_message("You clicked the button3!")
 
-class SelectFoodItemView(discord.ui.View):
+class SelectAllFoodItemView(discord.ui.View):
+    def __init__(self, *items, timeout = 180, disable_on_timeout = False, player: Player):
+        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
+        self.player = player
+
+
     @discord.ui.select( 
         placeholder = "Choose a Flavor!",
         min_values = 1,
         max_values = 1, 
         options = [ 
             discord.SelectOption(
-                label=food_item.name,
-                description=f"Pick this if you like {food_item.name}!"
+                value=ID.value,
+                label=data.name,
+                description=f"Pick this if you like {data.name}!"
             )
-            for food_item in ALL_FOOD_ITEMS
+            for ID, data in ALL_FOOD_ITEMS.items()
         ]
     )
-    async def select_callback(self, select, interaction): # the function called when the user is done selecting options
-        await interaction.response.send_message(f"Awesome! I like {select.values[0]} too!")
+    async def select_callback(self, select, interaction):
+        await interaction.response.send_modal(SettingAddedMenuItemModal(
+            self.player, FoodItemID(select.values[0]), ALL_FOOD_ITEMS[FoodItemID(select.values[0])]))
 
 
 def setup(bot: Bot):
