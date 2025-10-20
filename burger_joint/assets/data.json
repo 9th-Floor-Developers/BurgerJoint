@@ -1,3 +1,37 @@
 [
-    
+    {
+        "user_id": 715804914516885534,
+        "username": "petepoo",
+        "shop_name": "MYTHON",
+        "balance": 0,
+        "level": 1,
+        "xp": 0,
+        "burgers_sold": 0,
+        "upgrades": [],
+        "employees": [],
+        "badges": [
+            "Rename Your Burger Joint"
+        ],
+        "menu_items": [
+            {
+                "food_item_ID": "Classic Burger",
+                "name": "Classic Burger",
+                "price": 12,
+                "prestige": 0
+            },
+            {
+                "food_item_ID": "Fries",
+                "name": "Fries",
+                "price": 4,
+                "prestige": 0
+            },
+            {
+                "food_item_ID": "Soda",
+                "name": "Soda",
+                "price": 2,
+                "prestige": 0
+            }
+        ],
+        "prestige": 0
+    }
 ]
