@@ -1,7 +1,8 @@
 import discord 
-from discord import ui
+from discord import ui, Embed
 from burger_joint.model import MenuItem, FoodItemID, Player, FoodItem, ALL_FOOD_ITEMS
 from .database import save_data
+from .datacheck import is_positive_int
 
 class SettingAddedMenuItemModal(ui.Modal):
     def __init__(self, player: Player, food_item_ID: FoodItemID):
@@ -16,7 +17,16 @@ class SettingAddedMenuItemModal(ui.Modal):
 
 
     async def callback(self, interaction: discord.Interaction):
-        embed = discord.Embed(title="Adding item to menu")
+
+        name : str = self.children[0].value
+        if await self.player.has_menu_item_name(name, interaction):
+            return
+
+        if not await is_positive_int(self.children[1].value, interaction, varible_name="price"):
+            return
+        price : int = self.children[1].value
+
+        embed = Embed(title="Adding item to menu")
         embed.add_field(name="Name", value=self.children[0].value)
         embed.add_field(name="Price", value=self.children[1].value)
         await interaction.response.send_message(embeds=[embed])
@@ -28,7 +38,3 @@ class SettingAddedMenuItemModal(ui.Modal):
             prestige=0
             ))
         save_data(self.player)
-            
-        
-
-        

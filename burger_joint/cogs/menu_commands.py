@@ -53,14 +53,14 @@ class SelectAllFoodItemView(discord.ui.View):
 
 
     @discord.ui.select( 
-        placeholder = "Choose a Flavor!",
+        placeholder = "Choose a food!",
         min_values = 1,
         max_values = 1, 
         options = [ 
             discord.SelectOption(
                 value=ID.value,
                 label=data.name,
-                description=f"Pick this if you like {data.name}!"
+                description=f"Pick this if you like to put a {data.name} in your menu!"
             )
             for ID, data in ALL_FOOD_ITEMS.items()
         ]

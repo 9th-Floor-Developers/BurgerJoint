@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from discord import ApplicationContext
+from discord import ApplicationContext, Interaction, Color
 
 from burger_joint.model.upgrades import Employee, Upgrade
 from burger_joint.model.enums import BadgeID
@@ -45,3 +45,21 @@ class Player:
 	
 	def has_badge(self, badge_id: BadgeID) -> bool:
 		return badge_id in self.badges
+	
+	async def has_menu_item_name(self, name : str, interaction : Interaction | None = None) -> bool:
+		for item in self.menu_items:
+			if item.name.strip() == name.strip():
+				if interaction != None:
+					from burger_joint.utils import embeds
+
+					await interaction.respond(
+						embed=embeds.simple_embed(
+							description_text=f"You already have a menu item named {name}",
+							embed_color=Color.red()),
+						ephemeral=True)
+					
+				return True
+		return False
+        	
+
+
