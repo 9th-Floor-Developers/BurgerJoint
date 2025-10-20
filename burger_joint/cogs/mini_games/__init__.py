@@ -1,8 +1,7 @@
-from .blackjack import BlackJack, Card, ChoiceButtons, Deck
+from .blackjack import BlackJack, Card, Deck
 
 __all__ = [
 	'BlackJack',
-	'ChoiceButtons',
 	'Deck',
 	'Card'
 ]

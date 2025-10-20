@@ -1,12 +1,11 @@
 """Display various information as embeds."""
 
-import discord
 from discord import Color, Embed
 
 from burger_joint.cogs.mini_games.blackjack import Card
-from burger_joint.model import Player
-from burger_joint.utils.constants import ALL_BADGES
-from burger_joint.utils.enums import LeaderboardID
+from burger_joint.utils.constants import ALL_BADGES, ALL_FOOD_ITEMS
+from burger_joint.utils.enums import FoodCategoryID, LeaderboardID
+from model.player import Player
 
 
 def simple_embed(
@@ -26,10 +25,9 @@ def status_embed(player: Player) -> Embed:
 	
 	embed = Embed(
 		title=f"🍔 {player.shop_name} Status:",
-		description=
-		f"🏆 Level: {player.level} | ✨ XP: {player.xp} | 💰 Balance: ${player.balance}"
-		,
-		color=discord.Color.green()
+		description=f"🏆 Level: {player.level} | ✨ XP: {player.xp} | "
+		            f"💰 Balance: ${player.balance}",
+		color=Color.green()
 	)
 	
 	embed.add_field(
@@ -80,7 +78,7 @@ def leaderboard_embed(
 ) -> Embed:
 	embed = Embed(
 		title=f"🍔 {leaderboard_type.value[0]} Leaderboard 🍔",
-		color=discord.Color.purple()
+		color=Color.purple()
 	)
 	
 	for i, player in enumerate(players):
@@ -95,6 +93,29 @@ def leaderboard_embed(
 	return embed
 
 
+def menu_embed(player: Player) -> Embed:
+	embed = Embed(
+		title=f"🍔 {player.shop_name}'s Menu:",
+		color=Color.lighter_grey()
+	)
+	
+	menu_item_categories: set[FoodCategoryID] = {
+		ALL_FOOD_ITEMS[item.item_id].category
+		for item in player.menu_items
+	}
+	
+	for category in menu_item_categories:
+		items_text = "\n".join(
+			f"{item.name} — ${item.price}"
+				for item in player.menu_items
+				if ALL_FOOD_ITEMS[item.item_id].category == category
+		)
+		
+		embed.add_field(name=category.value, value=items_text, inline=False)
+	
+	return embed
+
+
 def blackjack_embed(
 	player_cards: list[Card],
 	dealer_cards: list[Card],
@@ -102,7 +123,7 @@ def blackjack_embed(
 ) -> Embed:
 	embed = Embed(
 		title=f'♣️ Blackjack ♦️',
-		color=discord.Color.red()
+		color=Color.red()
 	)
 	
 	embed.add_field(

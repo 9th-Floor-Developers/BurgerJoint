@@ -5,21 +5,23 @@ from discord import ApplicationContext, Bot, Cog, Color, Embed, Message, \
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
-from burger_joint.model import FoodItem
-from burger_joint.utils import ALL_FOOD_ITEMS, database
+from burger_joint.model.food_item import FoodItem
+from burger_joint.utils import database
+from burger_joint.utils.constants import ALL_FOOD_ITEMS
 
 
 class WorkCommands(Cog):
 	@slash_command(description="Work to earn money and XP")
 	@player_check
 	async def work(self, ctx: ApplicationContext):
-		await ctx.respond("work in progress")
+		await ctx.respond("Starting Work Session...")
 		WorkSession(ctx)
 
 
 class WorkSession:
 	def __init__(self, ctx: ApplicationContext):
 		self.ctx = ctx
+		self.message_display: Message | None = None
 		
 		self.updater.start()
 		self.ordered_items: list[FoodItem] = []
@@ -36,7 +38,7 @@ class WorkSession:
 	
 	async def on_order_item(self):
 		menu_item: FoodItem = ALL_FOOD_ITEMS[
-			random.choice(list(self.ctx.player.menu_items))]
+			random.choice(list(self.ctx.player.menu_items))]  # type: ignore
 		
 		self.ordered_items.append(menu_item)
 		self.money_earned += menu_item.price
@@ -50,22 +52,22 @@ class WorkSession:
 		)
 	
 	@updater.after_loop
-	async def finnish_session(self):
-		self.ctx.player.balance += self.money_earned
-		database.save_data(self.ctx.player)
+	async def finish_session(self):
+		self.ctx.player.balance += self.money_earned  # type: ignore
+		database.save_data(self.ctx.player)  # type: ignore
 		
 		await self.message_display.edit(
 			embed=await self.work_session_embed(True)
 		)
 	
-	async def work_session_embed(self, is_finnish: bool = False) -> Embed:
+	async def work_session_embed(self, is_finished: bool = False) -> Embed:
 		if self.counter < 5:
 			return Embed(
 				title="Work Session Starting...",
-				description="Geting ready to serve some customers!",
+				description="Getting ready to serve some customers!",
 				color=Color.yellow()
 			)
-		if len(self.ordered_items) == 0:
+		if not self.ordered_items:
 			return Embed(
 				title="Work Session In Progress",
 				description="No items served yet...", color=Color.yellow()
@@ -76,7 +78,7 @@ class WorkSession:
 				for i, item in enumerate(self.ordered_items)
 		)
 		
-		if (is_finnish):
+		if is_finished:
 			embed = Embed(title="Work Session Finished!", color=Color.green())
 		else:
 			embed = Embed(
