@@ -40,4 +40,8 @@ class Player:
 			)
 	
 	def has_badge(self, badge_id: BadgeID) -> bool:
-		return badge_id in self.badges
+		for player_badge in list(self.badges):
+			if player_badge.value == badge_id.value:
+				return True
+
+		return False
