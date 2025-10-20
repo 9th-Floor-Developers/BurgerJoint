@@ -1,12 +1,11 @@
 import functools
 import random
 
-import discord
-from discord import ApplicationContext, Bot, Cog, Option
+from discord import ApplicationContext, Bot, Cog, Color, Option, slash_command
 
 from bot import player_check
 from burger_joint.cogs.mini_games.blackjack import BlackJack
-from burger_joint.model import Player
+from burger_joint.model.player import Player
 from burger_joint.utils import embeds
 
 
@@ -19,7 +18,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 				await ctx.respond(
 					embed=embeds.simple_embed(
 						description_text='🏦 You do not have any money.',
-						embed_color=discord.Color.red()
+						embed_color=Color.red()
 					)
 				)
 				return
@@ -27,7 +26,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 				await ctx.respond(
 					embed=embeds.simple_embed(
 						description_text=f'💵 You need at least ${needed} (${needed - player.balance} more).',
-						embed_color=discord.Color.red()
+						embed_color=Color.red()
 					)
 				)
 				return
@@ -38,7 +37,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 					await ctx.respond(
 						embed=embeds.simple_embed(
 							description_text=f'💰 You cannot spend more than you have',
-							embed_color=discord.Color.red()
+							embed_color=Color.red()
 						)
 					)
 					return
@@ -46,7 +45,7 @@ def cost_check(needed: int = 1, extra: bool = False):
 					await ctx.respond(
 						embed=embeds.simple_embed(
 							description_text=f'💰 You cannot bet a negative number.',
-							embed_color=discord.Color.red()
+							embed_color=Color.red()
 						)
 					)
 					return
@@ -62,22 +61,53 @@ class MiniGames(Cog):
 	def __init__(self, bot):
 		self.bot = bot
 	
-	@discord.slash_command(description='')
+	@slash_command(description='')
 	@player_check
 	@cost_check(extra=True)
 	async def blackjack(self, ctx: ApplicationContext, bet: int) -> None:
 		player: Player = ctx.player  # type: ignore
-		streak = await BlackJack().play(bet, ctx)
-		player.balance += streak - bet
+		player.balance -= bet
+		game: BlackJack = BlackJack()
+		
+		response = await ctx.respond(
+			embed=embeds.simple_embed('Starting blackjack...')
+		)
+		game.message = await response.original_response()
+		streak = 0
+		
+		while True:
+			result: int = await game.play_round(bet)
+			player.balance += result
+			if result:
+				streak += result
+			else:
+				streak -= bet
+			
+			await game.buttons.wait()
+			
+			if game.buttons.value == 'replay':
+				if bet > player.balance:
+					await ctx.edit(
+						embed=embeds.simple_embed(
+							description_text=f'💰 You cannot spend more than you have',
+							embed_color=Color.red()
+						)
+					)
+					return
+				
+				game.__init__()
+				game.message = await response.original_response()
+				continue
+			break
 		
 		await ctx.respond(
 			embed=embeds.simple_embed(
-				title_text=f'You made ${streak}!',
+				title_text=f'You made ${streak - bet}!',
 				description_text=f'New balance: ${player.balance}'
 			)
 		)
 	
-	@discord.slash_command(description='')
+	@slash_command(description='')
 	@player_check
 	@cost_check(extra=True)
 	async def coinflip(
@@ -107,10 +137,12 @@ class MiniGames(Cog):
 				embed=embeds.simple_embed(
 					title_text=f'📉 {result}... You lost ${bet}',
 					description_text=f'New balance: ${player.balance}',
-					embed_color=discord.Color.red()
+					embed_color=Color.red()
 				)
 			)
 
 
 def setup(bot: Bot):
 	bot.add_cog(MiniGames(bot))
+
+
