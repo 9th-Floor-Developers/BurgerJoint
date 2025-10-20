@@ -40,12 +40,12 @@ class Deck:
 
 
 class BlackJack:
-	def __init__(self) -> None:
+	def __init__(self, user_id) -> None:
 		self.deck: Deck = Deck()
 		self.player_cards: list[Card] = [self.deck.draw(), self.deck.draw()]
 		self.dealer_cards: list[Card] = [self.deck.draw()]
 		self.secret_card: Card = self.deck.draw()
-		self.user_id: int | None = None
+		self.user_id: int = user_id
 		self.message: Message | None = None
 		self.buttons: ChoiceButtons | None = None
 	

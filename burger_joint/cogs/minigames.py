@@ -67,7 +67,7 @@ class MiniGames(Cog):
 	async def blackjack(self, ctx: ApplicationContext, bet: int) -> None:
 		player: Player = ctx.player  # type: ignore
 		player.balance -= bet
-		game: BlackJack = BlackJack()
+		game: BlackJack = BlackJack(player.user_id)
 		
 		response = await ctx.respond(
 			embed=embeds.simple_embed('Starting blackjack...')
@@ -95,7 +95,7 @@ class MiniGames(Cog):
 					)
 					return
 				
-				game.__init__()
+				game.__init__(player.user_id)
 				game.message = await response.original_response()
 				continue
 			break
