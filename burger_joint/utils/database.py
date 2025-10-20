@@ -6,8 +6,7 @@ from typing import Any
 
 from discord import User
 
-from burger_joint.model import Player, FoodItem, MenuItem
-from burger_joint.utils import BadgeID, FoodItemID, STARTING_MENU
+from burger_joint.model import Player, FoodItem, MenuItem, BadgeID, FoodItemID, STARTING_MENU
 
 
 def json_path() -> str:

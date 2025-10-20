@@ -1,6 +1,6 @@
 from burger_joint.model.badge import Badge
 from burger_joint.model.food_item import FoodItem, MenuItem
-from burger_joint.utils.enums import BadgeID, FoodItemID, FoodCategoryID
+from burger_joint.model.enums import BadgeID, FoodItemID, FoodCategoryID
 
 def get_default_menu_item(food_item_ID : FoodItemID) -> MenuItem:
 	food_item : FoodItem = ALL_FOOD_ITEMS[food_item_ID]

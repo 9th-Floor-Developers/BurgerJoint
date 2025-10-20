@@ -3,8 +3,8 @@ from discord import ApplicationContext, Bot, Cog, slash_command, SlashCommandGro
 import discord
 from discord.ext import tasks
 from burger_joint.bot import player_check
-from burger_joint.utils import FoodItemID, FoodCategoryID, database, ALL_FOOD_ITEMS, SettingAddedMenuItemModal
-from burger_joint.model import FoodItem, MenuItem, Player
+from burger_joint.utils import database, SettingAddedMenuItemModal
+from burger_joint.model import FoodItem, MenuItem, Player, FoodItemID, FoodCategoryID, ALL_FOOD_ITEMS
 from discord import Embed, Message, Color
 
 class MenuCommands(Cog):

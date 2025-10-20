@@ -4,9 +4,8 @@ import functools
 import discord
 from discord import ApplicationContext, Bot, Intents
 
-from burger_joint.model import Player
+from burger_joint.model import Player, BadgeID
 from burger_joint.utils import database
-from burger_joint.utils import BadgeID
 from utils import embeds
 
 bot = Bot(intents=Intents.all())

@@ -5,8 +5,8 @@ from discord import Color, Embed
 
 from burger_joint.cogs.mini_games.blackjack import Card
 from burger_joint.model import Player
-from burger_joint.utils.constants import ALL_BADGES
-from burger_joint.utils.enums import LeaderboardID
+from burger_joint.model.constants import ALL_BADGES
+from burger_joint.model.enums import LeaderboardID
 
 
 def simple_embed(

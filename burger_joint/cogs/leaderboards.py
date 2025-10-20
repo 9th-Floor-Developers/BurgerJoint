@@ -4,7 +4,7 @@ from discord import ApplicationContext, Bot, Cog, SlashCommandGroup
 
 from burger_joint.model import Player
 from burger_joint.utils import database, embeds
-from burger_joint.utils.enums import LeaderboardID
+from burger_joint.model.enums import LeaderboardID
 
 
 class Leaderboards(Cog):

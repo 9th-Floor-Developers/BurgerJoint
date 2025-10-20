@@ -3,7 +3,8 @@ from dataclasses import dataclass
 from discord import ApplicationContext
 
 from burger_joint.model.upgrades import Employee, Upgrade
-from burger_joint.utils import BadgeID, ALL_BADGES
+from burger_joint.model.enums import BadgeID
+from burger_joint.model.constants import ALL_BADGES
 from burger_joint.model.food_item import MenuItem
 
 
