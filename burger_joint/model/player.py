@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 from discord import ApplicationContext
 
-from burger_joint.model.food_item import MenuItem
 from burger_joint.model.upgrades import Employee, Upgrade
-from burger_joint.utils.constants import ALL_BADGES, BadgeID
+from burger_joint.utils import BadgeID, ALL_BADGES
+from burger_joint.model.food_item import MenuItem
 
 
 @dataclass
@@ -21,6 +21,9 @@ class Player:
 	badges: set[BadgeID]
 	menu_items: list[MenuItem]
 	prestige: int
+	
+	def __post_init__(self):
+		pass  # any calculations after init if necessary
 	
 	async def unlock_badge(
 		self,
@@ -40,8 +43,4 @@ class Player:
 			)
 	
 	def has_badge(self, badge_id: BadgeID) -> bool:
-		for player_badge in list(self.badges):
-			if player_badge.value == badge_id.value:
-				return True
-
-		return False
+		return badge_id in self.badges

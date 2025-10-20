@@ -6,10 +6,8 @@ from typing import Any
 
 from discord import User
 
-from model.food_item import MenuItem
-from model.player import Player
-from utils.constants import STARTING_MENU
-from utils.enums import BadgeID, FoodItemID
+from burger_joint.model import Player, FoodItem, MenuItem
+from burger_joint.utils import BadgeID, FoodItemID, STARTING_MENU
 
 
 def json_path() -> str:
@@ -23,42 +21,36 @@ def json_path() -> str:
 def create_new_player(user: User):
 	player = Player(
 		user_id=user.id, username=user.name,
-		shop_name=f"{user.name}'s Burger Joint",
-		balance=100, level=1, xp=0, burgers_sold=0, prestige=0,
-		upgrades=[], employees=[], badges=set(), menu_items=STARTING_MENU
+		shop_name=f"{user.name}'s Burger Joint", balance=100, level=1,
+		xp=0, burgers_sold=0, upgrades=[], employees=[], badges=set(), menu_items=STARTING_MENU,
+		prestige=0
 	)
 	save_data(player)
 	return player
 
 
-def get_player(user_id: int) -> Player | None:
+def get_player(id: int) -> Player | None:
 	with open(json_path()) as f:
 		file: list[dict[str, Any]] = json.load(f)
 		
 		for player_json in file:
-			if player_json['user_id'] != user_id:
-				continue
-			
-			# sets badges as type list[str]
-			# sets menu_items as type list[dict[str, int | str]]
-			player = Player(**player_json)
-			
-			player.badges = {  # sets badges as type set[BadgeID]
-				BadgeID(badge)
-				for badge in player.badges  # badge of type str
-			}
-			
-			player.menu_items = [  # sets menu_items as type list[MenuItem]
-				MenuItem(**menu_item)  # type: ignore
-				for menu_item in player.menu_items
-				# menu_item of type dict[str, int | str]
-			]
-			
-			# item_id of type str
-			for menu_item in player.menu_items:
-				menu_item.item_id = FoodItemID(menu_item.item_id)
-			
-			return player
+			if player_json['user_id'] == id:
+				player = Player(**player_json)  # sets badges as type list
+				
+				player.badges = {
+					BadgeID(badge)
+					for badge in player.badges
+				}
+
+				player.menu_items = [
+					MenuItem(**menu_item)
+					for menu_item in player.menu_items
+				]
+
+				for menu_item in player.menu_items:
+					menu_item.food_item_ID = FoodItemID(menu_item.food_item_ID)
+					
+				return player
 	return None
 
 
