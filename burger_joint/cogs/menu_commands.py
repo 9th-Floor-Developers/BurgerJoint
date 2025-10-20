@@ -1,8 +1,10 @@
-from discord import ApplicationContext, Bot, ButtonStyle, Cog, slash_command
-from discord.ui import button, View
+from discord import ApplicationContext, Bot, ButtonStyle, Cog, SelectOption, \
+	slash_command
+from discord.ui import button, select, View
 
 from burger_joint.bot import player_check
 from utils import embeds
+from utils.constants import ALL_FOOD_ITEMS
 
 
 class MenuCommands(Cog):
@@ -10,8 +12,8 @@ class MenuCommands(Cog):
 	@player_check
 	async def menu(self, ctx: ApplicationContext):
 		await ctx.respond(
-			embed=embeds.menu_embed(ctx.player), view=MenuView()
-			# type: ignore
+			embed=embeds.menu_embed(ctx.player),  # type: ignore
+			view=MenuView()
 		)
 
 
@@ -20,7 +22,7 @@ class MenuView(View):
 		label="Add Item", style=ButtonStyle.success  # type: ignore
 	)
 	async def add_item_button_callback(self, _, interaction):
-		await interaction.response.send_message("You clicked the button1!")
+		await interaction.response.send_message(view=SelectFoodItemView())
 	
 	@button(label="Remove Item", style=ButtonStyle.red)  # type: ignore
 	async def remove_item_button_callback(self, _, interaction):
@@ -33,27 +35,13 @@ class MenuView(View):
 		await interaction.response.send_message("You clicked the button3!")
 
 
-class MenuView(discord.ui.View):
-	@button(label="Add Item", style=discord.ButtonStyle.success)
-	async def add_item_button_callback(self, button, interaction):
-		await interaction.response.send_message(view=SelectFoodItemView())
-	
-	@discord.ui.button(label="Remove Item", style=discord.ButtonStyle.red)
-	async def remove_item_button_callback(self, button, interaction):
-		await interaction.response.send_message("You clicked the button2!")
-	
-	@discord.ui.button(label="Edit Item", style=discord.ButtonStyle.primary)
-	async def edit_item_button_callback(self, button, interaction):
-		await interaction.response.send_message("You clicked the button3!")
-
-
-class SelectFoodItemView(discord.ui.View):
-	@discord.ui.select(
+class SelectFoodItemView(View):
+	@select(
 		placeholder="Choose a Flavor!",
 		min_values=1,
 		max_values=1,
 		options=[
-			discord.SelectOption(
+			SelectOption(
 				label=food_item.name,
 				description=f"Pick this if you like {food_item.name}!"
 			)

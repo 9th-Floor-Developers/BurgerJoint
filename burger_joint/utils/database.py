@@ -54,6 +54,7 @@ def get_player(user_id: int) -> Player | None:
 				# menu_item of type dict[str, int | str]
 			]
 			
+			# item_id of type str
 			for menu_item in player.menu_items:
 				menu_item.item_id = FoodItemID(menu_item.item_id)
 			
