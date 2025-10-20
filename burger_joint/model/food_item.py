@@ -11,14 +11,13 @@ class FoodItem:
 	category: FoodCategoryID
 
 
+"""Represents a food item on a player's menu. may have different name, price,
+and prestige level than the base FoodItem depending on the joint"""
+
+
 @dataclass
 class MenuItem:
-	"""
-	Represents a food item on a player's menu. may have different name, price,
-	and prestige level than the base FoodItem depending on the joint
-	"""
-	
-	item_id: FoodItemID
+	food_item_ID: FoodItemID
 	name: str
-	price: int
+	price: str
 	prestige: int
