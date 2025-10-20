@@ -4,7 +4,7 @@ from discord import ApplicationContext
 
 from burger_joint.model.food_item import MenuItem
 from burger_joint.model.upgrades import Employee, Upgrade
-from burger_joint.utils import ALL_BADGES, BadgeID
+from burger_joint.utils.constants import ALL_BADGES, BadgeID
 
 
 @dataclass

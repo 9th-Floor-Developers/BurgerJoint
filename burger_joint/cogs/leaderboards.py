@@ -2,7 +2,6 @@ import functools
 
 from discord import ApplicationContext, Bot, Cog, SlashCommandGroup
 
-from burger_joint.model import Player
 from burger_joint.utils import database, embeds
 from burger_joint.utils.enums import LeaderboardID
 
@@ -16,6 +15,8 @@ class Leaderboards(Cog):
 		def decorator(func):
 			@functools.wraps(func)
 			async def wrapper(self, ctx: ApplicationContext):
+				from model import Player
+				
 				players: list[Player] = database.get_all_players()
 				players.sort(key=lambda p: getattr(p, attr), reverse=True)
 				await ctx.respond(

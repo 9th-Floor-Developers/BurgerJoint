@@ -5,8 +5,9 @@ from discord import ApplicationContext, Bot, Cog, Color, Embed, Message, \
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
-from burger_joint.model import FoodItem
-from burger_joint.utils import ALL_FOOD_ITEMS, database
+from burger_joint.model.food_item import FoodItem
+from burger_joint.utils import database
+from burger_joint.utils.constants import ALL_FOOD_ITEMS
 
 
 class WorkCommands(Cog):

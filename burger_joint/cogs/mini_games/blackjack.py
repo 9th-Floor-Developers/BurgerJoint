@@ -1,9 +1,9 @@
 import random
 from typing import override
 
-from discord import ApplicationContext, ButtonStyle, Message
+from discord import ButtonStyle, Message
 
-from burger_joint.utils import ChoiceButtons
+from burger_joint.utils.inputs import ChoiceButtons
 
 
 class Card:
@@ -82,15 +82,15 @@ class BlackJack:
 		)
 		self.buttons = ChoiceButtons(
 			{
-				'🔄️ Replay': ButtonStyle.green,
-				'💸 Cash Out': ButtonStyle.red
+				'🔄️ Replay': ButtonStyle.green
 			},
-			user_id=self.user_id
+			user_id=self.user_id,
+			timeout=10
 		)
 		
 		if p_val == 21 and d_val != 21:
 			await self.update_embed('🎉 You Win!', 'You have blackjack!')
-			return int(.5 * bet)
+			return int(1.5 * bet + .5)
 		elif d_val == 21:
 			await self.update_embed('❌ You Lose...', 'Dealer has blackjack!')
 			return 0
@@ -101,7 +101,8 @@ class BlackJack:
 					'➕ Hit': ButtonStyle.green,
 					'🛑 Stand': ButtonStyle.red
 				},
-				user_id=self.user_id
+				user_id=self.user_id,
+				timeout=20
 			)
 			await self.message.edit(
 				embed=blackjack_embed(
@@ -116,8 +117,8 @@ class BlackJack:
 			if buttons.value == 'hit':
 				self.player_cards.append(self.deck.draw())
 				p_val = self.hand_value(self.player_cards)
-			else:
-				break
+				continue
+			break
 		
 		if p_val > 21:
 			await self.update_embed('❌ You Lose...', 'Your hand is over 21!')
@@ -130,14 +131,18 @@ class BlackJack:
 		d_val = self.hand_value(self.dealer_cards)
 		
 		if d_val > 21:
-			msg, res = ('🎉 You Win!', 'Dealer has over 21!'), int(.5 * bet)
+			msg, res = ('🎉 You Win!', 'Dealer has over 21!'), int(
+				1.5 * bet + .5
+			)
 		elif d_val == 21:
 			msg, res = ('❌ You Lose...', 'Dealer has blackjack!'), 0
 		elif p_val == 21:
-			msg, res = ('🎉 You Win!', 'You have blackjack!'), int(.5 * bet)
+			msg, res = ('🎉 You Win!', 'You have blackjack!'), int(
+				1.5 * bet + .5
+			)
 		elif p_val > d_val:
 			msg, res = (('🎉 You Win!', 'You have higher than the dealer!'),
-				int(.5 * bet)
+				int(1.5 * bet + .5)
 			)
 		elif p_val < d_val:
 			msg, res = ('❌ You Lose...', 'Dealer has higher than you!'), 0
@@ -147,31 +152,3 @@ class BlackJack:
 		
 		await self.update_embed(*msg)
 		return res
-	
-	async def play(
-		self,
-		bet: int,
-		ctx: ApplicationContext
-	) -> int:
-		from utils import embeds
-		
-		self.user_id = ctx.author.id
-
-		response = await ctx.respond(
-			embed=embeds.simple_embed('Starting blackjack...')
-		)
-		self.message = await response.original_response()
-		streak = 0
-		
-		while True:
-			result = await self.play_round(bet)
-			streak += result - (0 if result else bet)
-			
-			await self.buttons.wait()
-			
-			if self.buttons.value == 'replay':
-				self.__init__()
-				self.message = await response.original_response()
-				continue
-			break
-		return streak

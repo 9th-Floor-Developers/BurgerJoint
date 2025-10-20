@@ -8,9 +8,10 @@ class ChoiceButtons(View):
 	def __init__(
 		self,
 		buttons: dict[str, int],
-		user_id: int | None = None
+		user_id: int | None = None,
+		timeout: int = 30
 	) -> None:
-		super().__init__()
+		super().__init__(timeout=timeout)
 		self.user_id = user_id
 		self.value = None
 		for label, style in buttons.items():
@@ -32,5 +33,10 @@ class ChoiceButtons(View):
 		
 		await interaction.response.defer()
 		self.value = interaction.data["custom_id"].lower().split()[1]
+		await self.message.edit(embed=self.message.embeds[0], view=None)
 		self.stop()
 		return True
+	
+	@override
+	async def on_timeout(self) -> None:
+		await self.message.edit(embed=self.message.embeds[0], view=None)

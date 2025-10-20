@@ -6,8 +6,10 @@ from typing import Any
 
 from discord import User
 
-from burger_joint.model import Player
-from burger_joint.utils import BadgeID, FoodItemID, STARTING_MENU
+from model.food_item import MenuItem
+from model.player import Player
+from utils.constants import STARTING_MENU
+from utils.enums import BadgeID, FoodItemID
 
 
 def json_path() -> str:
@@ -35,17 +37,19 @@ def get_player(user_id: int) -> Player | None:
 		
 		for player_json in file:
 			if player_json['user_id'] == user_id:
-				player = Player(**player_json)  # sets badges as type list
+				# sets badges as type list[str]
+				# sets menu_items as type list[dict[str, int | str]]
+				player = Player(**player_json)
 				
-				player.badges = {  # sets badges as type set
+				player.badges = {  # sets badges as type set[BadgeID]
 					BadgeID(badge)
 					for badge in player.badges
 				}
 				
-				# player.menu_items = [
-				# 	MenuItem(**menu_item)
-				# 	for menu_item in player.menu_items
-				# ]
+				player.menu_items = [  # sets menu_items as type list[MenuItem]
+					MenuItem(**menu_item)  # type: ignore
+					for menu_item in player.menu_items
+				]
 				
 				for menu_item in player.menu_items:
 					menu_item.item_id = FoodItemID(menu_item.item_id)
