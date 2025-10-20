@@ -36,25 +36,28 @@ def get_player(user_id: int) -> Player | None:
 		file: list[dict[str, Any]] = json.load(f)
 		
 		for player_json in file:
-			if player_json['user_id'] == user_id:
-				# sets badges as type list[str]
-				# sets menu_items as type list[dict[str, int | str]]
-				player = Player(**player_json)
-				
-				player.badges = {  # sets badges as type set[BadgeID]
-					BadgeID(badge)
-					for badge in player.badges
-				}
-				
-				player.menu_items = [  # sets menu_items as type list[MenuItem]
-					MenuItem(**menu_item)  # type: ignore
-					for menu_item in player.menu_items
-				]
-				
-				for menu_item in player.menu_items:
-					menu_item.item_id = FoodItemID(menu_item.item_id)
-				
-				return player
+			if player_json['user_id'] != user_id:
+				continue
+			
+			# sets badges as type list[str]
+			# sets menu_items as type list[dict[str, int | str]]
+			player = Player(**player_json)
+			
+			player.badges = {  # sets badges as type set[BadgeID]
+				BadgeID(badge)
+				for badge in player.badges  # badge of type str
+			}
+			
+			player.menu_items = [  # sets menu_items as type list[MenuItem]
+				MenuItem(**menu_item)  # type: ignore
+				for menu_item in player.menu_items
+				# menu_item of type dict[str, int | str]
+			]
+			
+			for menu_item in player.menu_items:
+				menu_item.item_id = FoodItemID(menu_item.item_id)
+			
+			return player
 	return None
 
 
