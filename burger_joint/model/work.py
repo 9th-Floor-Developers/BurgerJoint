@@ -27,6 +27,7 @@ class OrderedItem:
 			display = ":cooking:-"
 		elif self.state == "finished":
 			display = ":white_check_mark:-"
+			green_length = length
 
 		display += ":green_square:" * green_length
 		display += ":red_square:" * (length - green_length)

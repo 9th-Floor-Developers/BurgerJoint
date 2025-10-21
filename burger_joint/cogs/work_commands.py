@@ -5,7 +5,7 @@ from discord import ApplicationContext, Bot, Cog, Color, Embed, Message, \
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
-from burger_joint.model import ALL_FOOD_ITEMS, FoodItem, Order, MenuItem, OrderedItem
+from burger_joint.model import ALL_FOOD_ITEMS, FoodItem, Order, MenuItem, OrderedItem, Player, FoodCategoryID
 from burger_joint.utils import database
 
 
@@ -19,39 +19,71 @@ class WorkCommands(Cog):
 class WorkSession:
 	def __init__(self, ctx: ApplicationContext):
 		self.ctx = ctx
-		self.player = ctx.player
+		self.player: Player = ctx.player
 		
 		self.updater.start()
 		self.orders: list[Order] = []
 
-		self.finished_orders:int = 0
-		self.total_orders:int = 0
+		self.finished_orders: int = 0
+		self.total_orders: int = 0
 
 		self.money_earned: int = 0
 		self.message_display: Message | None = None
 		
 		self.counter: int = 0
 
+
+	def get_items_desires(self) -> list[list[MenuItem, float]]:
+		desires: list[list[MenuItem, float]] = []
+		for menu_item in self.player.menu_items:
+			desire: float = 0.6
+			default_price = ALL_FOOD_ITEMS[menu_item.food_item_ID].default_price
+
+			desire -= (menu_item.price/default_price - 1)
+
+			desires.append([menu_item, desire])
+
+		return desires
+
+	def apply_loss_leader_effect(self, desires: list[list[MenuItem, float]], exception: MenuItem) -> list[list[MenuItem, float]]:
+		for desire in desires:
+			if ALL_FOOD_ITEMS[desire[0].food_item_ID].category != ALL_FOOD_ITEMS[exception.food_item_ID].category:
+				desire[1] += 0.3
+
+		return desires
+
+
 	async def generate_order(self) -> Order:
 		ordering_items: list[OrderedItem] = []
-		for menu_item in self.player.menu_items:
-			ordering_items.append(OrderedItem(
-				menu_item=menu_item,
-				amount=random.randint(1, 3),
-				state="waiting"))
+		desires: list[list[MenuItem, float]] = self.get_items_desires()
 
-		self.orders.append(Order(
-			ordered_items=ordering_items
-		))
-		self.total_orders += 1
+		for desire in desires:
+			desire[1] = min(0.9, desire[1])
+			if (random.random() < desire[1]):
+				amount: int = 1
+				if (random.random() < desire[1] / 2):
+					amount += 1
+
+				ordering_items.append(OrderedItem(
+					menu_item=desire[0],
+					amount=amount,
+					state="waiting"))
+
+				if (len(ordering_items) == 1):
+					desires = self.apply_loss_leader_effect(desires, desire[0])
+
+		if ordering_items:
+			self.orders.append(Order(
+				ordered_items=ordering_items
+			))
+			self.total_orders += 1
 
 	
 	@tasks.loop(seconds=0.5)
 	async def updater(self):
 		self.counter += 1
-		if self.counter > 3 and self.counter < 100 and len(self.orders) < 5:
-			if random.random() < 0.2:
-				await self.generate_order()
+		if self.counter > 3 and self.counter < 100 and len(self.orders) < 5: #TODO Remove hard limit
+			await self.generate_order()
 
 		await self.update_work_progress()
 		await self.update_finished_orders()
