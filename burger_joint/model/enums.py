@@ -11,6 +11,11 @@ class BadgeID(Enum):
 	SELL_10000_BURGERS = 'Sell 10000 Burgers'
 
 
+class UpgradeID(Enum):
+	DRIVE_THRU = 'Increase Customers Per Work Session',
+	CASH_REGISTER = 'Increase Cost Of All Food Items'
+
+
 class LeaderboardID(Enum):
 	BALANCE = ('Balance', 'balance')
 	XP = ('XP', 'xp')

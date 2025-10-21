@@ -4,9 +4,16 @@ from dataclasses import dataclass
 @dataclass
 class Upgrade:
 	name: str
-	level: int
+	description: str
 	cost: int
-	mult: float
+	mult: float = 1.0
+	level: int = 0
+	
+	def upgrade(self):
+		self.cost *= self.mult
+		round(self.cost, 2)
+		self.mult = self.mult + (.1 * self.level)
+		self.level += 1
 
 
 # TODO Related Commands:
