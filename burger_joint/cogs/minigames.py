@@ -144,5 +144,3 @@ class MiniGames(Cog):
 
 def setup(bot: Bot):
 	bot.add_cog(MiniGames(bot))
-
-

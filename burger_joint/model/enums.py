@@ -10,10 +10,11 @@ class BadgeID(Enum):
 	SELL_1000_BURGERS = 'Sell 1000 Burgers'
 	SELL_10000_BURGERS = 'Sell 10000 Burgers'
 
+
 class LeaderboardID(Enum):
 	BALANCE = ('Balance', 'balance')
 	XP = ('XP', 'xp')
-	BURGERS_SOLD= ('Burgers', 'burgers_sold')
+	BURGERS_SOLD = ('Burgers', 'burgers_sold')
 	PRESTIGE = ('Prestige', 'prestige')
 
 

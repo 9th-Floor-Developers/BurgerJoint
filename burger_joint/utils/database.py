@@ -6,7 +6,8 @@ from typing import Any
 
 from discord import User
 
-from burger_joint.model import Player, FoodItem, MenuItem, BadgeID, FoodItemID, STARTING_MENU
+from burger_joint.model import BadgeID, FoodItemID, MenuItem, Player, \
+	STARTING_MENU
 
 
 def json_path() -> str:
@@ -21,34 +22,35 @@ def create_new_player(user: User):
 	player = Player(
 		user_id=user.id, username=user.name,
 		shop_name=f"{user.name}'s Burger Joint", balance=100, level=1,
-		xp=0, burgers_sold=0, upgrades=[], employees=[], badges=set(), menu_items=STARTING_MENU,
+		xp=0, burgers_sold=0, upgrades=[], employees=[], badges=set(),
+		menu_items=STARTING_MENU,
 		prestige=0
 	)
 	save_data(player)
 	return player
 
 
-def get_player(id: int) -> Player | None:
+def get_player(user_id: int) -> Player | None:
 	with open(json_path()) as f:
 		file: list[dict[str, Any]] = json.load(f)
 		
 		for player_json in file:
-			if player_json['user_id'] == id:
+			if player_json['user_id'] == user_id:
 				player = Player(**player_json)  # sets badges as type list
 				
 				player.badges = {
 					BadgeID(badge)
 					for badge in player.badges
 				}
-
+				
 				player.menu_items = [
-					MenuItem(**menu_item)
+					MenuItem(**menu_item)  # type: ignore
 					for menu_item in player.menu_items
 				]
-
+				
 				for menu_item in player.menu_items:
 					menu_item.food_item_ID = FoodItemID(menu_item.food_item_ID)
-					
+				
 				return player
 	return None
 

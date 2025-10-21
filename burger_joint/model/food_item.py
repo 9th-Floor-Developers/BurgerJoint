@@ -1,17 +1,26 @@
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from model import FoodCategoryID, FoodItemID
+
 
 @dataclass
 class FoodItem:
 	name: str
 	price: int
-	difficulty: int 
-	category : any
+	difficulty: int
+	category: 'FoodCategoryID'
 
-"""Represents a food item on a player's menu. may have different name, price, 
-and prestige level than the base FoodItem depending on the joint"""
+
 @dataclass
 class MenuItem:
-	food_item_ID : any
+	"""
+	Represents a food item on a player's menu. may have different name, price,
+	and prestige level than the base FoodItem depending on the joint
+	"""
+	
+	food_item_ID: 'FoodItemID'
 	name: str
-	price: str
-	prestige: int 
+	price: int
+	prestige: int

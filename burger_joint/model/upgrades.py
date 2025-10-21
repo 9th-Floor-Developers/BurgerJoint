@@ -8,6 +8,7 @@ class Upgrade:
 	cost: int
 	mult: float
 
+
 # TODO Related Commands:
 #  - /shop
 #  - /buy <UPGRADE>
