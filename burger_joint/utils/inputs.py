@@ -2,20 +2,21 @@ from typing import override
 
 from discord import Interaction
 from discord.ui import Button, View
+from burger_joint.model import Player
 
 
 class PerPersonView(View):
 	def __init__(
 		self,
-		user_id: int | None = None,
+		player: Player | None = None,
 		timeout: int = 2100
 	) -> None:
 		super().__init__(timeout=timeout)
-		self.user_id = user_id
+		self.player = player
 	
 	@override
 	async def interaction_check(self, interaction: Interaction) -> bool:
-		if self.user_id and interaction.user.id != self.user_id:
+		if self.player and interaction.user.id != self.player.user_id:
 			await interaction.respond(
 				'This is not your button!', ephemeral=True
 			)
@@ -27,10 +28,10 @@ class ChoiceButtons(PerPersonView):
 	def __init__(
 		self,
 		buttons: dict[str, int],
-		user_id: int | None = None,
+		player: int | None = None,
 		timeout: int = 30
 	) -> None:
-		super().__init__(user_id=user_id, timeout=timeout)
+		super().__init__(player=player, timeout=timeout)
 		self.value = None
 		for label, style in buttons.items():
 			self.add_item(

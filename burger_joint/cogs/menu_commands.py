@@ -1,9 +1,8 @@
 import random
 from discord import ApplicationContext, Bot, Cog, slash_command, SlashCommandGroup
 import discord
-from discord.ext import tasks
 from burger_joint.bot import player_check
-from burger_joint.utils import database, SettingAddedMenuItemModal
+from burger_joint.utils import database, SettingAddedMenuItemModal, PerPersonView, EditingMenuItemModal, embeds
 from burger_joint.model import FoodItem, MenuItem, Player, FoodItemID, FoodCategoryID, ALL_FOOD_ITEMS
 from discord import Embed, Message, Color
 
@@ -29,29 +28,20 @@ def menu_embed(player : Player) -> Embed:
 
     return embed
           
-class MenuView(discord.ui.View):
-    def __init__(self, *items, timeout = 180, disable_on_timeout = False, player: Player):
-        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
-        self.player = player
-
+class MenuView(PerPersonView):
     @discord.ui.button(label="Add Item", style=discord.ButtonStyle.success) 
     async def add_item_button_callback(self, button, interaction):
         await interaction.response.send_message(view=SelectAllFoodItemView(player=self.player))
 
     @discord.ui.button(label="Remove Item", style=discord.ButtonStyle.red) 
     async def remove_item_button_callback(self, button, interaction):
-        await interaction.response.send_message("You clicked the button2!")
+        await interaction.response.send_message(view=SelectPlayerFoodItemView(player=self.player, mode="remove"))
 
     @discord.ui.button(label="Edit Item", style=discord.ButtonStyle.primary) 
     async def edit_item_button_callback(self, button, interaction):
-        await interaction.response.send_message("You clicked the button3!")
+        await interaction.response.send_message(view=SelectPlayerFoodItemView(player=self.player, mode="edit"))
 
-class SelectAllFoodItemView(discord.ui.View):
-    def __init__(self, *items, timeout = 180, disable_on_timeout = False, player: Player):
-        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
-        self.player = player
-
-
+class SelectAllFoodItemView(PerPersonView):
     @discord.ui.select( 
         placeholder = "Choose a food!",
         min_values = 1,
@@ -73,6 +63,47 @@ class SelectAllFoodItemView(discord.ui.View):
 	        )
         )
 
+
+class SelectPlayerFoodItemView(PerPersonView):
+    def __init__(self, mode : str, player = None):
+        super().__init__(player)
+        self.mode = mode
+
+        options = []
+        for i, menu_item in enumerate(self.player.menu_items):
+            options.append(discord.SelectOption(    
+                value=str(i),
+                label=menu_item.name,
+                description=f"Edit the {menu_item.name} in your menu"
+            ))
+
+        if not options:
+            return
+
+        select = discord.ui.Select(
+            placeholder="Choose a food!",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+        async def _select_callback(interaction):
+            if mode == "edit":
+                await interaction.response.send_modal(
+                    EditingMenuItemModal(self.player,  int(select.values[0]))
+                )
+            elif mode == "remove":
+                await interaction.respond(
+                    embed=embeds.simple_embed(
+                        description_text=f"Removing item from menu"
+                    ),
+		        )
+                self.player.menu_items.pop(int(select.values[0]))
+                database.save_data(self.player)
+
+
+        select.callback = _select_callback
+        self.add_item(select)
 
 def setup(bot: Bot):
 	bot.add_cog(MenuCommands(bot))

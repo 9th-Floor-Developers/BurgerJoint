@@ -3,6 +3,7 @@ from typing import override
 
 from discord import ButtonStyle, Color, Embed, Message
 
+from burger_joint.model.player import Player
 from burger_joint.utils.inputs import ChoiceButtons
 
 
@@ -40,12 +41,12 @@ class Deck:
 
 
 class BlackJack:
-	def __init__(self, user_id) -> None:
+	def __init__(self, player) -> None:
 		self.deck: Deck = Deck()
 		self.player_cards: list[Card] = [self.deck.draw(), self.deck.draw()]
 		self.dealer_cards: list[Card] = [self.deck.draw()]
 		self.secret_card: Card = self.deck.draw()
-		self.user_id: int = user_id
+		self.player: Player = player
 		self.message: Message | None = None
 		self.buttons: ChoiceButtons | None = None
 	
@@ -80,7 +81,7 @@ class BlackJack:
 			{
 				'🔄️ Replay': ButtonStyle.green
 			},
-			user_id=self.user_id,
+			player=self.player,
 			timeout=10
 		)
 		
@@ -97,7 +98,7 @@ class BlackJack:
 					'➕ Hit': ButtonStyle.green,
 					'🛑 Stand': ButtonStyle.red
 				},
-				user_id=self.user_id,
+				player=self.player,
 				timeout=20
 			)
 			await self.message.edit(
