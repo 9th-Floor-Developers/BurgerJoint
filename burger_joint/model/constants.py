@@ -1,6 +1,8 @@
 from burger_joint.model.badge import Badge
+from burger_joint.model.enums import BadgeID, FoodCategoryID, FoodItemID, \
+	UpgradeID
 from burger_joint.model.food_item import FoodItem, MenuItem
-from burger_joint.model.enums import BadgeID, FoodItemID, FoodCategoryID
+from burger_joint.model.upgrades import Upgrade
 
 
 def get_default_menu_item(food_item_id: FoodItemID) -> MenuItem:
@@ -26,6 +28,15 @@ ALL_BADGES: dict[BadgeID, Badge] = {
 	),
 	BadgeID.SELL_10000_BURGERS: Badge(
 		BadgeID.SELL_10000_BURGERS.value, None, 100_000
+	)
+}
+
+ALL_UPGRADES: dict[UpgradeID, Upgrade] = {
+	UpgradeID.DRIVE_THRU: Upgrade(
+		'Drive Thru', UpgradeID.DRIVE_THRU.value, 10_000
+	),
+	UpgradeID.CASH_REGISTER: Upgrade(
+		'Cash Register', UpgradeID.CASH_REGISTER.value, 5_000
 	)
 }
 
