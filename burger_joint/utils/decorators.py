@@ -93,10 +93,12 @@ def leaderboard_command(attr: str, leaderboard_id: LeaderboardID):
 	def decorator(func):
 		@functools.wraps(func)
 		async def wrapper(self, ctx: ApplicationContext):
+			from cogs.leaderboards import leaderboard_embed
+			
 			players: list[Player] = database.get_all_players()
 			players.sort(key=lambda p: getattr(p, attr), reverse=True)
 			await ctx.respond(
-				embed=embeds.leaderboard_embed(players, leaderboard_id)
+				embed=leaderboard_embed(players, leaderboard_id)
 			)
 		
 		return wrapper

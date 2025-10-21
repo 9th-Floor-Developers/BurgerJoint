@@ -1,7 +1,7 @@
 import random
 from typing import override
 
-from discord import ButtonStyle, Message
+from discord import ButtonStyle, Color, Embed, Message
 
 from burger_joint.utils.inputs import ChoiceButtons
 
@@ -63,8 +63,6 @@ class BlackJack:
 		msg: str,
 		extra: bool = True
 	) -> None:
-		from utils.embeds import blackjack_embed
-		
 		embed = blackjack_embed(
 			self.player_cards, self.dealer_cards, self.hand_value
 		).add_field(name=title, value=msg, inline=False)
@@ -75,8 +73,6 @@ class BlackJack:
 		await self.message.edit(embed=embed, view=self.buttons)
 	
 	async def play_round(self, bet: int, ) -> int:
-		from utils.embeds import blackjack_embed
-		
 		p_val, d_val = self.hand_value(self.player_cards), self.hand_value(
 			self.dealer_cards
 		)
@@ -152,3 +148,34 @@ class BlackJack:
 		
 		await self.update_embed(*msg)
 		return res
+
+
+def blackjack_embed(
+	player_cards: list[Card],
+	dealer_cards: list[Card],
+	value_func
+) -> Embed:
+	embed = Embed(
+		title=f'♣️ Blackjack ♦️',
+		color=Color.red()
+	)
+	
+	embed.add_field(
+		name='Your Cards:',
+		value=' '.join(str(c) for c in player_cards)
+	).add_field(
+		name='Dealer Cards:',
+		value=' '.join(str(c) for c in dealer_cards)
+	)
+	
+	embed.add_field(name='-------------------------', value='', inline=False)
+	
+	embed.add_field(
+		name=f'Total: {value_func(player_cards)}',
+		value=''
+	).add_field(
+		name=f'Total: {value_func(dealer_cards)}',
+		value=''
+	)
+	
+	return embed
