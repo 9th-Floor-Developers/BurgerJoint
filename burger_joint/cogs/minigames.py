@@ -1,4 +1,3 @@
-import functools
 import random
 
 from discord import ApplicationContext, Bot, Cog, Color, Option, slash_command
@@ -7,54 +6,7 @@ from bot import player_check
 from burger_joint.cogs.mini_games.blackjack import BlackJack
 from burger_joint.model.player import Player
 from burger_joint.utils import embeds
-
-
-def cost_check(needed: int = 1, extra: bool = False):
-	def decorator(func):
-		@functools.wraps(func)
-		async def wrapper(self, ctx: ApplicationContext, *args, **kwargs):
-			player: Player = ctx.player  # type: ignore
-			if player.balance < 1:
-				await ctx.respond(
-					embed=embeds.simple_embed(
-						description_text='🏦 You do not have any money.',
-						embed_color=Color.red()
-					)
-				)
-				return
-			elif player.balance < needed:
-				await ctx.respond(
-					embed=embeds.simple_embed(
-						description_text=f'💵 You need at least ${needed} (${needed - player.balance} more).',
-						embed_color=Color.red()
-					)
-				)
-				return
-			elif extra:
-				bet = list(kwargs.values())[0]
-				
-				if bet > player.balance:
-					await ctx.respond(
-						embed=embeds.simple_embed(
-							description_text=f'💰 You cannot spend more than you have',
-							embed_color=Color.red()
-						)
-					)
-					return
-				elif bet < 1:
-					await ctx.respond(
-						embed=embeds.simple_embed(
-							description_text=f'💰 You cannot bet a negative number.',
-							embed_color=Color.red()
-						)
-					)
-					return
-			
-			await func(self, ctx, *args, **kwargs)
-		
-		return wrapper
-	
-	return decorator
+from utils.decorators import cost_check
 
 
 class MiniGames(Cog):

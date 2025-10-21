@@ -1,30 +1,12 @@
-import functools
-
 from discord import ApplicationContext, Bot, Cog, SlashCommandGroup
 
-from burger_joint.model import Player
-from burger_joint.utils import database, embeds
 from burger_joint.model.enums import LeaderboardID
+from utils.decorators import leaderboard_command
 
 
 class Leaderboards(Cog):
 	def __init__(self, bot):
 		self.bot = bot
-	
-	@staticmethod
-	def leaderboard_command(attr: str, leaderboard_id: LeaderboardID):
-		def decorator(func):
-			@functools.wraps(func)
-			async def wrapper(self, ctx: ApplicationContext):
-				players: list[Player] = database.get_all_players()
-				players.sort(key=lambda p: getattr(p, attr), reverse=True)
-				await ctx.respond(
-					embed=embeds.leaderboard_embed(players, leaderboard_id)
-				)
-			
-			return wrapper
-		
-		return decorator
 	
 	_leaderboards = SlashCommandGroup(
 		'leaderboard', 'Display Various Leaderboards'

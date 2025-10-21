@@ -1,12 +1,12 @@
 """Bot initialization, event loop, command loader"""
-import functools
 
 import discord
 from discord import ApplicationContext, Bot, Intents
 
-from burger_joint.model import Player, BadgeID
+from burger_joint.model import BadgeID, Player
 from burger_joint.utils import database
 from utils import embeds
+from utils.decorators import player_check
 
 bot = Bot(intents=Intents.all())
 
@@ -21,40 +21,6 @@ def setup() -> Bot:
 	for cog in all_cogs:
 		bot.load_extension(f'cogs.{cog}')
 	return bot
-
-
-def player_check(func):
-	@functools.wraps(func)
-	async def wrapper(*args, **kwargs):
-		idx: int
-		if isinstance(args[0], ApplicationContext):
-			idx = 0
-		elif len(args) > 1 and isinstance(args[1], ApplicationContext):
-			idx = 1
-		else:
-			raise ValueError(
-				'No ApplicationContext found in first two arguments '
-				'of function decorated with @player_check'
-			)
-		
-		player: Player | None = database.get_player(args[idx].author.id)
-		if not player:
-			await args[idx].respond(
-				embed=embeds.simple_embed(
-					'❌ You do not own a burger joint!',
-					'Use the `/start` command to '
-					'start your very own burger joint!',
-					discord.Color.red()
-				)
-			)
-			return None
-		
-		args[idx].player = player
-		result = await func(*args, **kwargs)
-		database.save_data(player)
-		return result
-	
-	return wrapper
 
 
 @bot.event
