@@ -37,7 +37,8 @@ class WorkSession:
 		for menu_item in self.player.menu_items:
 			ordering_items.append(OrderedItem(
 				menu_item=menu_item,
-				amount=random.randint(1, 3),))
+				amount=random.randint(1, 3),
+				state="waiting"))
 
 		self.orders.append(Order(
 			ordered_items=ordering_items
@@ -45,29 +46,40 @@ class WorkSession:
 		self.total_orders += 1
 
 	
-	@tasks.loop(seconds=0.5, count=100)
+	@tasks.loop(seconds=0.5)
 	async def updater(self):
 		self.counter += 1
-		if self.counter > 5:
-			if random.random() < 0.3:
+		if self.counter > 3 and self.counter < 100 and len(self.orders) < 5:
+			if random.random() < 0.2:
 				await self.generate_order()
-			await self.update_work_progress()
-			await self.update_finished_orders()
+
+		await self.update_work_progress()
+		await self.update_finished_orders()
 
 		await self.message_display.edit(
 			embed=await self.work_session_embed()
 		)
+
+		if self.counter >= 100 and not self.orders:
+			self.updater.cancel()
+
+		
 
 	async def update_work_progress(self):
 		worker_amount: int = 5 #TODO link this to amount of employees
 
 		all_ordered_items: list[OrderedItem] = []
 		for order in self.orders:
-			all_ordered_items.extend([item for item in order.ordered_items if not item.is_finished()])
+			all_ordered_items.extend([item for item in order.ordered_items if not item.state == "finished"])
 
 		working_on_items: list[OrderedItem] = all_ordered_items[:worker_amount]
 		for item in working_on_items:
 			item.progress += 2 #TODO link this to updgrades
+			
+			if item.progress >= item.get_required_progress():
+				item.state = "finished"
+			else:
+				item.state = "working"
 
 		
 
@@ -94,18 +106,18 @@ class WorkSession:
 		)
 	
 	async def work_session_embed(self, is_finished: bool = False) -> Embed:
-		if self.counter < 5:
-			return Embed(
-				title="Preparing the joint",
-				description="Getting ready to serve some customers!",
-				color=Color.yellow()
-			)
-		if not self.orders:
-			return Embed(
-				title="Waiting for customers",
-				description="No orders currently", color=Color.yellow()
-			)
-		
+		if not is_finished:
+			if self.counter < 5:
+				return Embed(
+					title="Preparing the joint",
+					description="Getting ready to serve some customers!",
+					color=Color.yellow()
+				)
+			if not self.orders:
+				return Embed(
+					title="Waiting for customers",
+					description="No orders currently", color=Color.yellow()
+				)
 
 		embed = Embed(
 			title=(
@@ -115,8 +127,10 @@ class WorkSession:
 		
 		for i, order in enumerate(self.orders):
 			embed.add_field(
-				name=f"{i+1}.", value=order.get_items_display_string(), inline=False
-			)
+				name=f"Order {i}:", value=order.get_items_display_string(), inline=True
+			).add_field(
+				name="Progress", value=order.get_progresses_display_string(), inline=True
+			).add_field(name = chr(173), value = chr(173), inline=False)
 		
 		embed.add_field(
 			name="Finished orders", value=f"{self.finished_orders}/{self.total_orders}", inline=True

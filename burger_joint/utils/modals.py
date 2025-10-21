@@ -76,7 +76,7 @@ class SettingAddedMenuItemModal(Modal):
 		)
 		self.add_item(
 			InputText(
-				label="Price", value=str(self.food_item.price),
+				label="Price", value=str(self.food_item.default_price),
 				style=InputTextStyle.short  # type: ignore
 			)
 		)
