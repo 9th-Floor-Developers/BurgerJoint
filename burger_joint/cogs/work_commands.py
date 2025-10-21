@@ -23,6 +23,10 @@ class WorkSession:
 		
 		self.updater.start()
 		self.orders: list[Order] = []
+
+		self.finished_orders:int = 0
+		self.total_orders:int = 0
+
 		self.money_earned: int = 0
 		self.message_display: Message | None = None
 		
@@ -33,23 +37,46 @@ class WorkSession:
 		for menu_item in self.player.menu_items:
 			ordering_items.append(OrderedItem(
 				menu_item=menu_item,
-				amount=random.randint(1, 4),))
+				amount=random.randint(1, 3),))
 
 		self.orders.append(Order(
 			ordered_items=ordering_items
 		))
+		self.total_orders += 1
 
 	
-	@tasks.loop(seconds=0.5, count=50)
+	@tasks.loop(seconds=0.5, count=100)
 	async def updater(self):
 		self.counter += 1
 		if self.counter > 5:
-			if random.random() < 0.2:
+			if random.random() < 0.3:
 				await self.generate_order()
+			await self.update_work_progress()
+			await self.update_finished_orders()
 
 		await self.message_display.edit(
 			embed=await self.work_session_embed()
 		)
+
+	async def update_work_progress(self):
+		worker_amount: int = 5 #TODO link this to amount of employees
+
+		all_ordered_items: list[OrderedItem] = []
+		for order in self.orders:
+			all_ordered_items.extend([item for item in order.ordered_items if not item.is_finished()])
+
+		working_on_items: list[OrderedItem] = all_ordered_items[:worker_amount]
+		for item in working_on_items:
+			item.progress += 2 #TODO link this to updgrades
+
+		
+
+	async def update_finished_orders(self):
+		for order in self.orders:
+			if order.is_finished():
+				self.orders.remove(order)
+				self.money_earned += order.get_total_price()
+				self.finished_orders += 1
 	
 	@updater.before_loop
 	async def start_session(self):
@@ -76,22 +103,23 @@ class WorkSession:
 		if not self.orders:
 			return Embed(
 				title="Waiting for customers",
-				description="No items served yet...", color=Color.yellow()
+				description="No orders currently", color=Color.yellow()
 			)
 		
-		orders_text = "\n-------\n".join(
-			f"{order.display_item_string()}"
-				for i, order in enumerate(self.orders)
-		)
-		
+
 		embed = Embed(
 			title=(
 				"Work Session Finished!" if is_finished else "Work Session In Progress"),
 			color=Color.green()
-		).add_field(
-			name="Current orders", value=orders_text, inline=False
-		).add_field(
-			name="Total orders", value=str(len(self.orders)), inline=True
+		)
+		
+		for i, order in enumerate(self.orders):
+			embed.add_field(
+				name=f"{i+1}.", value=order.get_items_display_string(), inline=False
+			)
+		
+		embed.add_field(
+			name="Finished orders", value=f"{self.finished_orders}/{self.total_orders}", inline=True
 		).add_field(
 			name="Money Earned", value=f"${self.money_earned}", inline=True
 		)

@@ -50,3 +50,5 @@ async def is_positive_int(
 			)
 			return False
 	return True
+
+

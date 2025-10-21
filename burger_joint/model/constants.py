@@ -10,7 +10,7 @@ def get_default_menu_item(food_item_id: FoodItemID) -> MenuItem:
 	return MenuItem(
 		food_item_ID=food_item_id,
 		name=food_item.name,
-		price=food_item.price,
+		price=food_item.default_price,
 		prestige=0
 	)
 
@@ -42,19 +42,19 @@ ALL_UPGRADES: dict[UpgradeID, Upgrade] = {
 
 ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
 	FoodItemID.CLASSIC_BURGER: FoodItem(
-		FoodItemID.CLASSIC_BURGER.value, 12, 1, FoodCategoryID.BURGERS
+		FoodItemID.CLASSIC_BURGER.value, 12, 1, 20, FoodCategoryID.BURGERS
 	),
 	FoodItemID.FRIES: FoodItem(
-		FoodItemID.FRIES.value, 4, 1, FoodCategoryID.SNACKS
+		FoodItemID.FRIES.value, 4, 1, 10, FoodCategoryID.SNACKS
 	),
 	FoodItemID.SODA: FoodItem(
-		FoodItemID.SODA.value, 2, 1, FoodCategoryID.DRINKS
+		FoodItemID.SODA.value, 2, 1, 6, FoodCategoryID.DRINKS
 	),
 	FoodItemID.VEGGIE_BURGER: FoodItem(
-		FoodItemID.VEGGIE_BURGER.value, 14, 2, FoodCategoryID.BURGERS
+		FoodItemID.VEGGIE_BURGER.value, 14, 2, 15, FoodCategoryID.BURGERS
 	),
 	FoodItemID.CHICKEN_SANDWICH: FoodItem(
-		FoodItemID.CHICKEN_SANDWICH.value, 11, 2, FoodCategoryID.BURGERS
+		FoodItemID.CHICKEN_SANDWICH.value, 11, 2, 15, FoodCategoryID.BURGERS
 	)
 }
 

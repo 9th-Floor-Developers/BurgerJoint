@@ -7,9 +7,13 @@ if TYPE_CHECKING:
 
 @dataclass
 class FoodItem:
+	"""
+	Represent the base food type, the types information like how hard is it to make
+	"""
 	name: str
-	price: int
+	default_price: int
 	difficulty: int
+	required_progress: int
 	category: 'FoodCategoryID'
 
 

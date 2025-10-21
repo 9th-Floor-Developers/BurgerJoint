@@ -7,5 +7,5 @@ __all__ = [
     'ChoiceButtons',
     'SettingAddedMenuItemModal',
     'EditingMenuItemModal',
-    'is_positive_int'
+    'is_positive_int',
 ]
