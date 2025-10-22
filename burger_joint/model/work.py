@@ -8,7 +8,7 @@ class OrderedItem:
 	menu_item: MenuItem
 	amount: int = 1
 	state: str = "waiting"
-	progress: int = 0
+	progress: float = 0
 	quality: int = 100
 	
 	def get_required_progress(self) -> int:
@@ -32,7 +32,7 @@ class OrderedItem:
 		display += ":green_square:" * green_length
 		display += ":red_square:" * (length - green_length)
 
-		display += f" {self.progress//progress_per_peice}/{self.amount}"
+		display += f" {int(self.progress//progress_per_peice)}/{self.amount}"
 		return display
 	
 	def get_item_display_string(self) -> str:
@@ -46,8 +46,9 @@ class Order:
 	ordered_items: list[OrderedItem]
 	timer: int = 0
 	state: str = "waiting"
-	expected_quality: int = 50
-	expected_timer: int = 1
+
+	def get_expected_waiting_time(self) -> int:
+		return max(item.get_required_progress() for item in self.ordered_items)
 
 	def get_items_display_string(self) -> str:
 		return "\n".join(f"{ordered_item.get_item_display_string()}" for ordered_item in self.ordered_items)

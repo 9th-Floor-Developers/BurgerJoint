@@ -8,6 +8,9 @@ from burger_joint.bot import player_check
 from burger_joint.model import ALL_FOOD_ITEMS, FoodItem, Order, MenuItem, OrderedItem, Player, FoodCategoryID
 from burger_joint.utils import database
 
+ON_START_TAKING_ORDERS = 3
+ON_END_TAKING_ORDERS = 100
+
 
 class WorkCommands(Cog):
 	@slash_command(description="Work to earn money and XP")
@@ -29,7 +32,10 @@ class WorkSession:
 
 		self.money_earned: int = 0
 		self.message_display: Message | None = None
-		
+
+		self.avg_waiting_time: float = 0
+		self.avg_quality: float = 0
+
 		self.counter: int = 0
 
 
@@ -82,8 +88,11 @@ class WorkSession:
 	@tasks.loop(seconds=0.5)
 	async def updater(self):
 		self.counter += 1
-		if self.counter > 3 and self.counter < 100 and len(self.orders) < 5: #TODO Remove hard limit
+		if self.counter > ON_START_TAKING_ORDERS and self.counter < ON_END_TAKING_ORDERS and len(self.orders) < 5: #TODO Remove hard limit
 			await self.generate_order()
+
+		for order in self.orders:
+			order.timer += 1
 
 		await self.update_work_progress()
 		await self.update_finished_orders()
@@ -92,7 +101,7 @@ class WorkSession:
 			embed=await self.work_session_embed()
 		)
 
-		if self.counter >= 100 and not self.orders:
+		if self.counter >= ON_END_TAKING_ORDERS and not self.orders:
 			self.updater.cancel()
 
 		
@@ -106,7 +115,7 @@ class WorkSession:
 
 		working_on_items: list[OrderedItem] = all_ordered_items[:worker_amount]
 		for item in working_on_items:
-			item.progress += 2 #TODO link this to updgrades
+			item.progress += 1 #TODO link this to updgrades
 			
 			if item.progress >= item.get_required_progress():
 				item.state = "finished"
@@ -118,9 +127,11 @@ class WorkSession:
 	async def update_finished_orders(self):
 		for order in self.orders:
 			if order.is_finished():
-				self.orders.remove(order)
+				self.avg_waiting_time += order.timer - order.get_expected_waiting_time()
+				
 				self.money_earned += order.get_total_price()
 				self.finished_orders += 1
+				self.orders.remove(order)
 	
 	@updater.before_loop
 	async def start_session(self):
@@ -132,14 +143,19 @@ class WorkSession:
 	async def finnish_session(self):
 		self.player.balance += self.money_earned  # type: ignore
 		database.save_data(self.player)  # type: ignore
+
+		if self.finished_orders > 0:
+			self.avg_waiting_time = round(self.avg_waiting_time / self.finished_orders, 2)
 		
 		await self.message_display.edit(
 			embed=await self.work_session_embed(True)
 		)
 	
 	async def work_session_embed(self, is_finished: bool = False) -> Embed:
-		if not is_finished:
-			if self.counter < 5:
+		if is_finished:
+			return self.work_session_finish_orders_embed()
+		else:
+			if self.counter < ON_START_TAKING_ORDERS:
 				return Embed(
 					title="Preparing the joint",
 					description="Getting ready to serve some customers!",
@@ -148,18 +164,23 @@ class WorkSession:
 			if not self.orders:
 				return Embed(
 					title="Waiting for customers",
-					description="No orders currently", color=Color.yellow()
+					description="No orders currently"
 				)
+			else:
+				return self.work_session_orders_embed()
 
+
+
+	
+	def work_session_orders_embed(self):
 		embed = Embed(
-			title=(
-				"Work Session Finished!" if is_finished else "Work Session In Progress"),
+			title=("Work Session In Progress"),
 			color=Color.green()
 		)
 		
 		for i, order in enumerate(self.orders):
 			embed.add_field(
-				name=f"Order {i}:", value=order.get_items_display_string(), inline=True
+				name=f"Order {i+1}:", value=order.get_items_display_string(), inline=True
 			).add_field(
 				name="Progress", value=order.get_progresses_display_string(), inline=True
 			).add_field(name = chr(173), value = chr(173), inline=False)
@@ -171,6 +192,34 @@ class WorkSession:
 		)
 		
 		return embed
+	
+	def work_session_finish_orders_embed(self):
+		waiting_time_text: str
+		if (self.avg_waiting_time >= 30):
+			waiting_time_text = "Extemely long"
+		elif (self.avg_waiting_time >= 20):
+			waiting_time_text = "Very long"
+		elif (self.avg_waiting_time >= 10):
+			waiting_time_text = "Long"
+		elif (self.avg_waiting_time >= 0):
+			waiting_time_text = "Fine"
+		elif (self.avg_waiting_time >= -10):
+			waiting_time_text = "Good"
+		else:
+			waiting_time_text = "Great"
+
+		embed = Embed(
+			title=("Work Session Finished!"),
+			color=Color.green()
+		).add_field(
+			name="Waiting time:", value=f"{waiting_time_text} | {str(self.avg_waiting_time)}"
+		).add_field(
+			name="Quality:", value=""
+		).add_field(
+			name="Money Earned:", value=f"${self.money_earned}", inline=False
+		)
+		return embed
+
 
 
 def setup(bot: Bot):
