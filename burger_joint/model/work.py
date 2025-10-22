@@ -15,9 +15,9 @@ class OrderedItem:
 		return ALL_FOOD_ITEMS[self.menu_item.food_item_ID].required_progress * self.amount
 
 	def get_progress_display_string(self) -> str:
-		progress_per_peice: int = ALL_FOOD_ITEMS[self.menu_item.food_item_ID].required_progress 
+		required_progress_per_peice: int = ALL_FOOD_ITEMS[self.menu_item.food_item_ID].required_progress 
 		length: int = 8
-		green_length: int = math.floor((self.progress%progress_per_peice)/progress_per_peice*length)
+		green_length: int = math.floor((self.progress%required_progress_per_peice)/required_progress_per_peice*length)
 
 		display: str
 
@@ -32,7 +32,7 @@ class OrderedItem:
 		display += ":green_square:" * green_length
 		display += ":red_square:" * (length - green_length)
 
-		display += f" {int(self.progress//progress_per_peice)}/{self.amount}"
+		display += f" {int(self.progress//required_progress_per_peice)}/{self.amount}"
 		return display
 	
 	def get_item_display_string(self) -> str:
@@ -49,6 +49,9 @@ class Order:
 
 	def get_expected_waiting_time(self) -> int:
 		return max(item.get_required_progress() for item in self.ordered_items)
+	
+	def get_avg_quality(self) -> float:
+		return sum(item.quality for item in self.ordered_items) / len(self.ordered_items)
 
 	def get_items_display_string(self) -> str:
 		return "\n".join(f"{ordered_item.get_item_display_string()}" for ordered_item in self.ordered_items)

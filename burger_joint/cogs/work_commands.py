@@ -115,7 +115,11 @@ class WorkSession:
 
 		working_on_items: list[OrderedItem] = all_ordered_items[:worker_amount]
 		for item in working_on_items:
-			item.progress += 1 #TODO link this to updgrades
+			#TODO link these to updgrades
+			if random.random() < 0.3: 
+				item.quality -= 10 #Cook makes a mistake
+			else:
+				item.progress += 1 #Cook makes progress on the item
 			
 			if item.progress >= item.get_required_progress():
 				item.state = "finished"
@@ -128,6 +132,7 @@ class WorkSession:
 		for order in self.orders:
 			if order.is_finished():
 				self.avg_waiting_time += order.timer - order.get_expected_waiting_time()
+				self.avg_quality += order.get_avg_quality()
 				
 				self.money_earned += order.get_total_price()
 				self.finished_orders += 1
@@ -146,6 +151,9 @@ class WorkSession:
 
 		if self.finished_orders > 0:
 			self.avg_waiting_time = round(self.avg_waiting_time / self.finished_orders, 2)
+			self.avg_quality = round(self.avg_quality / self.finished_orders, 2)
+
+		
 		
 		await self.message_display.edit(
 			embed=await self.work_session_embed(True)
@@ -164,17 +172,16 @@ class WorkSession:
 			if not self.orders:
 				return Embed(
 					title="Waiting for customers",
-					description="No orders currently"
+					description="No orders currently",
+					color=Color.green()
 				)
 			else:
 				return self.work_session_orders_embed()
 
-
-
 	
 	def work_session_orders_embed(self):
 		embed = Embed(
-			title=("Work Session In Progress"),
+			title=("Work Session In Progress :cook:"),
 			color=Color.green()
 		)
 		
@@ -186,37 +193,51 @@ class WorkSession:
 			).add_field(name = chr(173), value = chr(173), inline=False)
 		
 		embed.add_field(
-			name="Finished orders", value=f"{self.finished_orders}/{self.total_orders}", inline=True
+			name="Finished orders :checkered_flag:", value=f"{self.finished_orders}/{self.total_orders}", inline=True
 		).add_field(
-			name="Money Earned", value=f"${self.money_earned}", inline=True
+			name="Money Earned :moneybag::", value=f"${self.money_earned}", inline=True
 		)
 		
 		return embed
 	
 	def work_session_finish_orders_embed(self):
 		waiting_time_text: str
-		if (self.avg_waiting_time >= 30):
-			waiting_time_text = "Extemely long"
+		if (self.avg_waiting_time >= 40):
+			waiting_time_text = "Extemely long :hourglass:"
+		elif (self.avg_waiting_time >= 30):
+			waiting_time_text = "Very long :turtle:"
 		elif (self.avg_waiting_time >= 20):
-			waiting_time_text = "Very long"
+			waiting_time_text = "Long :timer:"
 		elif (self.avg_waiting_time >= 10):
-			waiting_time_text = "Long"
+			waiting_time_text = "Fine :neutral_face:"
 		elif (self.avg_waiting_time >= 0):
-			waiting_time_text = "Fine"
-		elif (self.avg_waiting_time >= -10):
-			waiting_time_text = "Good"
+			waiting_time_text = "Good :fast_forward:"
 		else:
-			waiting_time_text = "Great"
+			waiting_time_text = "Great :zap:"
+		
+		quality_text: str
+		if (self.avg_quality >= 90):
+			quality_text = "Peak :mount_fuji:"
+		elif (self.avg_quality >= 70):
+			quality_text = "Great :star:"
+		elif (self.avg_quality >= 50):
+			quality_text = "Good :thumbsup:"
+		elif (self.avg_quality >= 30):
+			quality_text = "Fine :neutral_face:"
+		elif (self.avg_quality >= 10):
+			quality_text = "Poor :thumbsdown:"
+		else:
+			quality_text = "Puke :face_vomiting:"
 
 		embed = Embed(
-			title=("Work Session Finished!"),
+			title=("Work Session Finished! :checkered_flag:"),
 			color=Color.green()
 		).add_field(
-			name="Waiting time:", value=f"{waiting_time_text} | {str(self.avg_waiting_time)}"
+			name="Waiting time :hourglass_flowing_sand::", value=f"{waiting_time_text} | {str(self.avg_waiting_time)}"
 		).add_field(
-			name="Quality:", value=""
+			name="Quality :tongue::", value=f"{quality_text} | {str(self.avg_quality)}"
 		).add_field(
-			name="Money Earned:", value=f"${self.money_earned}", inline=False
+			name="Money Earned :moneybag::", value=f"${self.money_earned}", inline=False
 		)
 		return embed
 
