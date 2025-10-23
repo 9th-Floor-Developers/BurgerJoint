@@ -1,6 +1,6 @@
 import random
 
-from discord import ApplicationContext, Bot, Cog, Color, Embed, Message, \
+from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, Message, \
 	slash_command
 from discord.ext import tasks
 
@@ -31,7 +31,7 @@ class WorkSession:
 		self.total_orders: int = 0
 
 		self.money_earned: int = 0
-		self.message_display: Message | None = None
+		self.message_display: Interaction | None = None
 
 		self.avg_waiting_time: float = 0
 		self.avg_quality: float = 0
@@ -98,7 +98,7 @@ class WorkSession:
 		await self.update_finished_orders()
 
 		await self.message_display.edit(
-			embed=await self.work_session_embed()
+			embed=self.work_session_embed()
 		)
 
 		if self.counter >= ON_END_TAKING_ORDERS and not self.orders:
@@ -140,43 +140,53 @@ class WorkSession:
 	
 	@updater.before_loop
 	async def start_session(self):
-		self.message_display: Message = await self.ctx.respond(
-			embed=await self.work_session_embed()
+		self.message_display: Interaction = await self.ctx.respond(
+			embed=self.work_session_embed(),
+			ephemeral = True
 		)
 	
 	@updater.after_loop
 	async def finnish_session(self):
 		self.player.balance += self.money_earned  # type: ignore
-		database.save_data(self.player)  # type: ignore
 
 		if self.finished_orders > 0:
 			self.avg_waiting_time = round(self.avg_waiting_time / self.finished_orders, 2)
 			self.avg_quality = round(self.avg_quality / self.finished_orders, 2)
 
-		
-		
-		await self.message_display.edit(
-			embed=await self.work_session_embed(True)
-		)
-	
-	async def work_session_embed(self, is_finished: bool = False) -> Embed:
-		if is_finished:
-			return self.work_session_finish_orders_embed()
+		rewards_text: str = ""
+
+		if self.avg_waiting_time > 30 and self.avg_quality < 30:
+			self.player.prestige -= 1
+			rewards_text += "-1 Prestige"
+		elif self.avg_waiting_time < 0 and self.avg_quality > 70:
+			self.player.prestige += 1
+			rewards_text += "+1 Prestige"
 		else:
-			if self.counter < ON_START_TAKING_ORDERS:
-				return Embed(
-					title="Preparing the joint",
-					description="Getting ready to serve some customers!",
-					color=Color.yellow()
-				)
-			if not self.orders:
-				return Embed(
-					title="Waiting for customers",
-					description="No orders currently",
-					color=Color.green()
-				)
-			else:
-				return self.work_session_orders_embed()
+			rewards_text += "-"
+
+		database.save_data(self.player)
+		
+		await self.message_display.delete_original_response()
+		await self.message_display.channel.send(
+			embed=self.work_session_finish_orders_embed(rewards_text),
+		)
+		
+	
+	def work_session_embed(self) -> Embed:
+		if self.counter < ON_START_TAKING_ORDERS:
+			return Embed(
+				title="Preparing the joint",
+				description="Getting ready to serve some customers!",
+				color=Color.yellow()
+			)
+		if not self.orders:
+			return Embed(
+				title="Waiting for customers",
+				description="No orders currently",
+				color=Color.green()
+			)
+		else:
+			return self.work_session_orders_embed()
 
 	
 	def work_session_orders_embed(self):
@@ -200,7 +210,7 @@ class WorkSession:
 		
 		return embed
 	
-	def work_session_finish_orders_embed(self):
+	def work_session_finish_orders_embed(self, rewards_text: str):
 		waiting_time_text: str
 		if (self.avg_waiting_time >= 40):
 			waiting_time_text = "Extemely long :hourglass:"
@@ -238,6 +248,8 @@ class WorkSession:
 			name="Quality :tongue::", value=f"{quality_text} | {str(self.avg_quality)}"
 		).add_field(
 			name="Money Earned :moneybag::", value=f"${self.money_earned}", inline=False
+		).add_field(
+			name="Rewards :gift::", value=rewards_text, inline=False
 		)
 		return embed
 
