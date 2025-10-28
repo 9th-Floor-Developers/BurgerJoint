@@ -1,11 +1,12 @@
 import random
 
-from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, Message, \
+from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
 	slash_command
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
-from burger_joint.model import ALL_FOOD_ITEMS, FoodItem, Order, MenuItem, OrderedItem, Player, FoodCategoryID
+from burger_joint.model import ALL_FOOD_ITEMS, MenuItem, Order, OrderedItem, \
+	Player
 from burger_joint.utils import database
 
 ON_START_TAKING_ORDERS = 3
@@ -13,122 +14,137 @@ ON_END_TAKING_ORDERS = 100
 
 
 class WorkCommands(Cog):
-	@slash_command(description="Work to earn money and XP")
+	@slash_command(description='Work to earn money and XP')
 	@player_check
 	async def work(self, ctx: ApplicationContext):
 		WorkSession(ctx)
 
 
 class WorkSession:
-	def __init__(self, ctx: ApplicationContext):
+	def __init__(self, ctx: ApplicationContext) -> None:
 		self.ctx = ctx
-		self.player: Player = ctx.player
+		self.player: Player = ctx.player  # type: ignore
 		
 		self.updater.start()
 		self.orders: list[Order] = []
-
+		
 		self.finished_orders: int = 0
 		self.total_orders: int = 0
-
+		
 		self.money_earned: int = 0
 		self.message_display: Interaction | None = None
-
+		
 		self.avg_waiting_time: float = 0
 		self.avg_quality: float = 0
-
+		
 		self.counter: int = 0
-
-
-	def get_items_desires(self) -> list[list[MenuItem, float]]:
-		desires: list[list[MenuItem, float]] = []
+	
+	def get_items_desires(self) -> dict[MenuItem, float]:
+		desires: dict[MenuItem, float] = {}
 		for menu_item in self.player.menu_items:
 			desire: float = 0.6
-			default_price = ALL_FOOD_ITEMS[menu_item.food_item_ID].default_price
-
-			desire -= (menu_item.price/default_price - 1)
-
-			desires.append([menu_item, desire])
-
+			default_price = \
+				ALL_FOOD_ITEMS[menu_item.food_item_ID].default_price
+			
+			desire -= (menu_item.price / default_price - 1)
+			
+			desires[menu_item] = desire
+		
 		return desires
-
-	def apply_loss_leader_effect(self, desires: list[list[MenuItem, float]], exception: MenuItem) -> list[list[MenuItem, float]]:
-		for desire in desires:
-			if ALL_FOOD_ITEMS[desire[0].food_item_ID].category != ALL_FOOD_ITEMS[exception.food_item_ID].category:
-				desire[1] += 0.3
-
+	
+	@staticmethod
+	def apply_loss_leader_effect(
+		desires: dict[MenuItem, float],
+		exception: MenuItem
+	) -> dict[MenuItem, float]:
+		for menu_item in desires:
+			food = ALL_FOOD_ITEMS[menu_item.food_item_ID]
+			exception_food = ALL_FOOD_ITEMS[exception.food_item_ID]
+			
+			if food and exception_food and food.category != exception_food.category:
+				desires[menu_item] += 0.3
+		
 		return desires
-
-
-	async def generate_order(self) -> Order:
+	
+	async def generate_order(self) -> None:
 		ordering_items: list[OrderedItem] = []
-		desires: list[list[MenuItem, float]] = self.get_items_desires()
-
-		for desire in desires:
-			desire[1] = min(0.9, desire[1])
-			if (random.random() < desire[1]):
-				amount: int = 1
-				if (random.random() < desire[1] / 2):
-					amount += 1
-
-				ordering_items.append(OrderedItem(
-					menu_item=desire[0],
+		desires: dict[MenuItem, float] = self.get_items_desires()
+		
+		for menu_item in desires:
+			desires[menu_item] = min(0.9, desires[menu_item])
+			desire = desires[menu_item]
+			if random.random() > desire:
+				continue
+			
+			amount: int = 1
+			if random.random() < desire / 2:
+				amount += 1
+			
+			ordering_items.append(
+				OrderedItem(
+					menu_item=menu_item,
 					amount=amount,
-					state="waiting"))
-
-				if (len(ordering_items) == 1):
-					desires = self.apply_loss_leader_effect(desires, desire[0])
-
+					state='waiting'
+				)
+			)
+			
+			if len(ordering_items):
+				desires = self.apply_loss_leader_effect(desires, menu_item)
+		
 		if ordering_items:
-			self.orders.append(Order(
-				ordered_items=ordering_items
-			))
+			self.orders.append(
+				Order(
+					ordered_items=ordering_items
+				)
+			)
 			self.total_orders += 1
-
 	
 	@tasks.loop(seconds=0.5)
-	async def updater(self):
+	async def updater(self) -> None:
 		self.counter += 1
-		if self.counter > ON_START_TAKING_ORDERS and self.counter < ON_END_TAKING_ORDERS and len(self.orders) < 5: #TODO Remove hard limit
+		if ON_START_TAKING_ORDERS < self.counter < ON_END_TAKING_ORDERS \
+				and len(self.orders) < 5:  # TODO Remove hard limit
 			await self.generate_order()
-
+		
 		for order in self.orders:
 			order.timer += 1
-
+		
 		await self.update_work_progress()
 		await self.update_finished_orders()
-
+		
 		await self.message_display.edit(
 			embed=self.work_session_embed()
 		)
-
+		
 		if self.counter >= ON_END_TAKING_ORDERS and not self.orders:
 			self.updater.cancel()
-
+	
+	async def update_work_progress(self) -> None:
+		worker_amount: int = 5  # TODO link this to amount of employees
 		
-
-	async def update_work_progress(self):
-		worker_amount: int = 5 #TODO link this to amount of employees
-
 		all_ordered_items: list[OrderedItem] = []
 		for order in self.orders:
-			all_ordered_items.extend([item for item in order.ordered_items if not item.state == "finished"])
-
+			all_ordered_items.extend(
+				[
+					item
+					for item in order.ordered_items
+					if not item.state == 'finished'
+				]
+			)
+		
 		working_on_items: list[OrderedItem] = all_ordered_items[:worker_amount]
 		for item in working_on_items:
-			#TODO link these to updgrades
-			if random.random() < 0.3: 
-				item.quality -= 10 #Cook makes a mistake
+			# TODO link these to upgrades
+			if random.random() < 0.3:
+				item.quality -= 10  # Cook makes a mistake
 			else:
-				item.progress += 1 #Cook makes progress on the item
+				item.progress += 1  # Cook makes progress on the item
 			
-			if item.progress >= item.get_required_progress():
-				item.state = "finished"
-			else:
-				item.state = "working"
-
-		
-
-	async def update_finished_orders(self):
+			item.state = \
+				'finished' if item.progress >= item.get_required_progress() \
+				else 'working'
+	
+	async def update_finished_orders(self) -> None:
 		for order in self.orders:
 			if order.is_finished():
 				self.avg_waiting_time += order.timer - order.get_expected_waiting_time()
@@ -139,120 +155,131 @@ class WorkSession:
 				self.orders.remove(order)
 	
 	@updater.before_loop
-	async def start_session(self):
+	async def start_session(self) -> None:
 		self.message_display: Interaction = await self.ctx.respond(
 			embed=self.work_session_embed(),
-			ephemeral = True
+			ephemeral=True
 		)
 	
 	@updater.after_loop
-	async def finnish_session(self):
+	async def finnish_session(self) -> None:
 		self.player.balance += self.money_earned  # type: ignore
-
+		
 		if self.finished_orders > 0:
-			self.avg_waiting_time = round(self.avg_waiting_time / self.finished_orders, 2)
-			self.avg_quality = round(self.avg_quality / self.finished_orders, 2)
-
-		rewards_text: str = ""
-
-		if self.avg_waiting_time > 30 and self.avg_quality < 30:
+			self.avg_waiting_time = round(
+				self.avg_waiting_time / self.finished_orders, 2
+			)
+			self.avg_quality = round(
+				self.avg_quality / self.finished_orders, 2
+			)
+		
+		rewards_text: str = ''
+		
+		if self.avg_waiting_time > 30 > self.avg_quality:
 			self.player.prestige -= 1
-			rewards_text += "-1 Prestige"
+			rewards_text += '-1 Prestige'
 		elif self.avg_waiting_time < 0 and self.avg_quality > 70:
 			self.player.prestige += 1
-			rewards_text += "+1 Prestige"
+			rewards_text += '+1 Prestige'
 		else:
-			rewards_text += "-"
-
+			rewards_text += '-'
+		
 		database.save_data(self.player)
 		
 		await self.message_display.delete_original_response()
 		await self.message_display.channel.send(
 			embed=self.work_session_finish_orders_embed(rewards_text),
 		)
-		
 	
 	def work_session_embed(self) -> Embed:
 		if self.counter < ON_START_TAKING_ORDERS:
 			return Embed(
-				title="Preparing the joint",
-				description="Getting ready to serve some customers!",
+				title='Preparing the joint',
+				description='Getting ready to serve some customers!',
 				color=Color.yellow()
 			)
 		if not self.orders:
 			return Embed(
-				title="Waiting for customers",
-				description="No orders currently",
+				title='Waiting for customers',
+				description='No orders currently',
 				color=Color.green()
 			)
-		else:
-			return self.work_session_orders_embed()
-
+		
+		return self.work_session_orders_embed()
 	
-	def work_session_orders_embed(self):
+	def work_session_orders_embed(self) -> Embed:
 		embed = Embed(
-			title=("Work Session In Progress :cook:"),
+			title='Work Session In Progress :cook:',
 			color=Color.green()
 		)
 		
 		for i, order in enumerate(self.orders):
 			embed.add_field(
-				name=f"Order {i+1}:", value=order.get_items_display_string(), inline=True
+				name=f'Order {i + 1}:',
+				value=order.get_items_display_string(),
+				inline=True
 			).add_field(
-				name="Progress", value=order.get_progresses_display_string(), inline=True
-			).add_field(name = chr(173), value = chr(173), inline=False)
+				name='Progress',
+				value=order.get_progresses_display_string(),
+				inline=True
+			).add_field(
+				name=chr(173),
+				value=chr(173),
+				inline=False
+			)
 		
 		embed.add_field(
-			name="Finished orders :checkered_flag:", value=f"{self.finished_orders}/{self.total_orders}", inline=True
+			name='Finished orders :checkered_flag:',
+			value=f'{self.finished_orders}/{self.total_orders}', inline=True
 		).add_field(
-			name="Money Earned :moneybag::", value=f"${self.money_earned}", inline=True
+			name='Money Earned :moneybag::', value=f'${self.money_earned}',
+			inline=True
 		)
 		
 		return embed
 	
-	def work_session_finish_orders_embed(self, rewards_text: str):
-		waiting_time_text: str
-		if (self.avg_waiting_time >= 40):
-			waiting_time_text = "Extemely long :hourglass:"
-		elif (self.avg_waiting_time >= 30):
-			waiting_time_text = "Very long :turtle:"
-		elif (self.avg_waiting_time >= 20):
-			waiting_time_text = "Long :timer:"
-		elif (self.avg_waiting_time >= 10):
-			waiting_time_text = "Fine :neutral_face:"
-		elif (self.avg_waiting_time >= 0):
-			waiting_time_text = "Good :fast_forward:"
-		else:
-			waiting_time_text = "Great :zap:"
+	def work_session_finish_orders_embed(self, rewards_text: str) -> Embed:
+		waiting_time_text: str = next(
+			(text for limit, text in [
+				(40, 'Extremely long ⏳'),
+				(30, 'Very long 🐢'),
+				(20, 'Long ⏲️'),
+				(10, 'Fine 😐'),
+				(0, 'Good ⏩'),
+			] if self.avg_waiting_time >= limit),
+			'Great ⚡'
+		)
 		
-		quality_text: str
-		if (self.avg_quality >= 90):
-			quality_text = "Peak :mount_fuji:"
-		elif (self.avg_quality >= 70):
-			quality_text = "Great :star:"
-		elif (self.avg_quality >= 50):
-			quality_text = "Good :thumbsup:"
-		elif (self.avg_quality >= 30):
-			quality_text = "Fine :neutral_face:"
-		elif (self.avg_quality >= 10):
-			quality_text = "Poor :thumbsdown:"
-		else:
-			quality_text = "Puke :face_vomiting:"
-
+		quality_text: str = next(
+			(text for limit, text in [
+				(90, 'Awesome 🤩'),
+				(70, 'Great ⭐'),
+				(50, 'Good 👍'),
+				(30, 'Fine 😐'),
+				(10, 'Poor 👎'),
+			] if self.avg_quality >= limit),
+			'Puke 🤮'
+		)
+		
 		embed = Embed(
-			title=("Work Session Finished! :checkered_flag:"),
+			title='Work Session Finished! 🏁',
 			color=Color.green()
 		).add_field(
-			name="Waiting time :hourglass_flowing_sand::", value=f"{waiting_time_text} | {str(self.avg_waiting_time)}"
+			name='Waiting time ⏳:',
+			value=f'{waiting_time_text} | {str(self.avg_waiting_time)}'
 		).add_field(
-			name="Quality :tongue::", value=f"{quality_text} | {str(self.avg_quality)}"
+			name='Quality 👅:',
+			value=f'{quality_text} | {str(self.avg_quality)}'
 		).add_field(
-			name="Money Earned :moneybag::", value=f"${self.money_earned}", inline=False
+			name='Money Earned 💰:',
+			value=f'${self.money_earned}',
+			inline=False
 		).add_field(
-			name="Rewards :gift::", value=rewards_text, inline=False
+			name='Rewards 🎁:',
+			value=rewards_text,
+			inline=False
 		)
 		return embed
-
 
 
 def setup(bot: Bot):

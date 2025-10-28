@@ -73,7 +73,7 @@ class BlackJack:
 		
 		await self.message.edit(embed=embed, view=self.buttons)
 	
-	async def play_round(self, bet: int, ) -> int:
+	async def play_round(self, bet: int) -> int:
 		p_val, d_val = self.hand_value(self.player_cards), self.hand_value(
 			self.dealer_cards
 		)

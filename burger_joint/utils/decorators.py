@@ -2,9 +2,9 @@ import functools
 
 from discord import ApplicationContext, Color
 
-from model import Player
-from model.enums import LeaderboardID
-from utils import database, embeds
+from burger_joint.model.player import Player
+from burger_joint.model.enums import LeaderboardID
+from burger_joint.utils import database, embeds
 
 
 def player_check(func):
@@ -57,7 +57,8 @@ def cost_check(needed: int = 1, extra: bool = False):
 			elif player.balance < needed:
 				await ctx.respond(
 					embed=embeds.simple_embed(
-						description_text=f'💵 You need at least ${needed} (${needed - player.balance} more).',
+						description_text=f'💵 You need at least ${needed} '
+						                 f'(${needed - player.balance} more).',
 						embed_color=Color.red()
 					)
 				)
@@ -92,8 +93,8 @@ def cost_check(needed: int = 1, extra: bool = False):
 def leaderboard_command(attr: str, leaderboard_id: LeaderboardID):
 	def decorator(func):
 		@functools.wraps(func)
-		async def wrapper(self, ctx: ApplicationContext):
-			from cogs.leaderboards import leaderboard_embed
+		async def wrapper(_, ctx: ApplicationContext):
+			from burger_joint.cogs.leaderboards import leaderboard_embed
 			
 			players: list[Player] = database.get_all_players()
 			players.sort(key=lambda p: getattr(p, attr), reverse=True)

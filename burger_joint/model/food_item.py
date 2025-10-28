@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from model import FoodCategoryID, FoodItemID
+	from burger_joint.model.enums import FoodCategoryID, FoodItemID
 
 
 @dataclass
@@ -28,3 +28,14 @@ class MenuItem:
 	name: str
 	price: int
 	prestige: int
+	
+	@override
+	def __hash__(self):
+		return hash(
+			(
+				self.food_item_ID,
+				self.name,
+				self.price,
+				self.prestige
+			)
+		)

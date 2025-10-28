@@ -62,7 +62,7 @@ class Player:
 			
 			await interaction.respond(
 				embed=embeds.simple_embed(
-					description_text=f"You already have a menu item named {name}",
+					description_text=f'You already have a menu item named {name}',
 					embed_color=Color.red()
 				),
 				ephemeral=True

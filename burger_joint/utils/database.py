@@ -18,10 +18,10 @@ def json_path() -> str:
 	return data_path
 
 
-def create_new_player(user: User):
+def create_new_player(user: User) -> Player:
 	player = Player(
 		user_id=user.id, username=user.name,
-		shop_name=f"{user.name}'s Burger Joint", balance=100, level=1,
+		shop_name=f'{user.name}\'s Burger Joint', balance=100, level=1,
 		xp=0, burgers_sold=0, upgrades=[], employees=[], badges=set(),
 		menu_items=STARTING_MENU,
 		prestige=0
@@ -35,23 +35,25 @@ def get_player(user_id: int) -> Player | None:
 		file: list[dict[str, Any]] = json.load(f)
 		
 		for player_json in file:
-			if player_json['user_id'] == user_id:
-				player = Player(**player_json)  # sets badges as type list
-				
-				player.badges = {
-					BadgeID(badge)
-					for badge in player.badges
-				}
-				
-				player.menu_items = [
-					MenuItem(**menu_item)  # type: ignore
-					for menu_item in player.menu_items
-				]
-				
-				for menu_item in player.menu_items:
-					menu_item.food_item_ID = FoodItemID(menu_item.food_item_ID)
-				
-				return player
+			if player_json['user_id'] != user_id:
+				continue
+			
+			player = Player(**player_json)  # sets badges as type list
+			
+			player.badges = {
+				BadgeID(badge)
+				for badge in player.badges
+			}
+			
+			player.menu_items = [
+				MenuItem(**menu_item)  # type: ignore
+				for menu_item in player.menu_items
+			]
+			
+			for menu_item in player.menu_items:
+				menu_item.food_item_ID = FoodItemID(menu_item.food_item_ID)
+			
+			return player
 	return None
 
 
@@ -71,7 +73,7 @@ def json_convert(obj: Any):
 		return obj.value
 	if isinstance(obj, set):
 		return list(obj)
-	if hasattr(obj, "__dict__"):
+	if hasattr(obj, '__dict__'):
 		return obj.__dict__
 	return obj
 

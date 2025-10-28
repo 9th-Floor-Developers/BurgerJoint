@@ -2,8 +2,8 @@ from discord import ApplicationContext, Bot, Cog, Color, Embed, \
 	SlashCommandGroup
 
 from burger_joint.model.enums import LeaderboardID
-from model import Player
-from utils.decorators import leaderboard_command
+from burger_joint.model.player import Player
+from burger_joint.utils.decorators import leaderboard_command
 
 
 class Leaderboards(Cog):
@@ -37,16 +37,16 @@ def leaderboard_embed(
 	leaderboard_type: LeaderboardID
 ) -> Embed:
 	embed = Embed(
-		title=f"🍔 {leaderboard_type.value[0]} Leaderboard 🍔",
+		title=f'🍔 {leaderboard_type.value[0]} Leaderboard 🍔',
 		color=Color.purple()
 	)
 	
 	for i, player in enumerate(players):
 		embed.add_field(
-			name=f"{i + 1}. {player.shop_name} - "
-			     f"{getattr(player, leaderboard_type.value[1])} "
-			     f"{leaderboard_type.value[0]}",
-			value="",
+			name=f'{i + 1}. {player.shop_name} - '
+			     f'{getattr(player, leaderboard_type.value[1])} '
+			     f'{leaderboard_type.value[0]}',
+			value='',
 			inline=False
 		)
 	

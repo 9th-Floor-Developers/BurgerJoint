@@ -28,7 +28,7 @@ class ChoiceButtons(PerPersonView):
 	def __init__(
 		self,
 		buttons: dict[str, int],
-		player: int | None = None,
+		player: Player | None = None,
 		timeout: int = 30
 	) -> None:
 		super().__init__(player=player, timeout=timeout)
@@ -48,7 +48,7 @@ class ChoiceButtons(PerPersonView):
 			return True
 		
 		await interaction.response.defer()
-		self.value = interaction.data["custom_id"].lower().split()[1]
+		self.value = interaction.data['custom_id'].lower().split()[1]
 		await self.message.edit(embed=self.message.embeds[0], view=None)
 		self.stop()
 		return True

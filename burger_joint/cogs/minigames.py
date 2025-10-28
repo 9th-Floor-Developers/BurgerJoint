@@ -2,11 +2,11 @@ import random
 
 from discord import ApplicationContext, Bot, Cog, Color, Option, slash_command
 
-from bot import player_check
+from burger_joint.bot import player_check
 from burger_joint.cogs.mini_games.blackjack import BlackJack
 from burger_joint.model.player import Player
 from burger_joint.utils import embeds
-from utils.decorators import cost_check
+from burger_joint.utils.decorators import cost_check
 
 
 class MiniGames(Cog):

@@ -55,29 +55,30 @@ def status_embed(player: Player) -> Embed:
 	"""Returns an embed displaying the player's stats with emojis."""
 	
 	embed = Embed(
-		title=f"🍔 {player.shop_name} Status:",
+		title=f'🍔 {player.shop_name} Status:',
 		description=
-		f"🏆 Level: {player.level} | ✨ XP: {player.xp} | 💰 Balance: ${player.balance}"
-		,
+		f'🏆 Level: {player.level} | ✨ XP: {player.xp} '
+		f'| 💰 Balance: ${player.balance}',
 		color=discord.Color.green()
 	)
 	
 	embed.add_field(
-		name="💵 Burgers Sold",
+		name='💵 Burgers Sold',
 		value=str(player.burgers_sold)
 	).add_field(
-		name="🛠️ Upgrades",
+		name='🛠️ Upgrades',
 		value=str(len(player.upgrades))
 	).add_field(
-		name="👨‍🍳 Employees",
+		name='👨‍🍳 Employees',
 		value=str(len(player.employees))
 	).set_footer(
-		text=f"⭐ Prestige Level: {player.prestige}"
+		text=f'⭐ Prestige Level: {player.prestige}'
 	)
 	
 	return embed
 
-@bot.slash_command(description="Display your joint's status.")
+
+@bot.slash_command(description='Display your joint\'s status.')
 @player_check
 async def status(ctx: ApplicationContext):
 	await ctx.respond(embed=status_embed(ctx.player))  # type: ignore
@@ -100,7 +101,8 @@ async def rename(ctx: ApplicationContext, new_name: str):
 	player.shop_name = new_name
 	await ctx.respond(
 		embed=embeds.simple_embed(
-			description_text=f'✅ Changed burger joint name to: "{player.shop_name}"!'
+			description_text=f'✅ Changed burger joint '
+			                 f'name to: "{player.shop_name}"!'
 		)
 	)
 	await player.unlock_badge(BadgeID.RENAME_JOINT, ctx)
