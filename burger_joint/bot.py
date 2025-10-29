@@ -22,6 +22,7 @@ def setup() -> Bot:
 	all_cogs = [
 		'leaderboards',
 		'work_commands',
+		'upgrades',
 		'minigames',
 		'menu_commands',
 	]
