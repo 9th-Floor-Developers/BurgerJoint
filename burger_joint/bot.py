@@ -1,16 +1,21 @@
 """Bot initialization, event loop, command loader"""
+import asyncio
 
 import discord
-from discord import ApplicationContext, Bot, Embed, Intents
+from discord import ApplicationContext, Bot, ButtonStyle, Color, Embed, File, \
+	Intents, Message, TextChannel
+from discord.ext import tasks
 
 from burger_joint.model import BadgeID, Player
-from burger_joint.utils import database
+from burger_joint.utils import ChoiceButtons, database
 from model import ALL_BADGES
 from utils import embeds
 from utils.decorators import player_check
 from utils.embeds import simple_embed
 
 bot = Bot(intents=Intents.all())
+last_clicked = True
+unburying = False
 
 
 def setup() -> Bot:
@@ -26,12 +31,69 @@ def setup() -> Bot:
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
 	print('Burger Joint Bot Online')
+	
+	for guild in bot.guilds:
+		if guild.system_channel:
+			await spawn_upgrade_timer.start(guild.system_channel)
+
+
+@tasks.loop(minutes=10)
+async def spawn_upgrade_timer(channel: TextChannel) -> None:
+	if not last_clicked:
+		asyncio.create_task(unbury_spawn_upgrade_timer())
+	else:
+		asyncio.create_task(spawn_upgrade_message(channel))
+
+
+async def unbury_spawn_upgrade_timer() -> None:
+	global unburying, last_clicked
+	if unburying:
+		return
+	
+	unburying = True
+	await asyncio.sleep(86_400)  # number of seconds in a day
+	
+	if not last_clicked:
+		last_clicked = True
+		unburying = False
+
+
+async def spawn_upgrade_message(channel: TextChannel) -> None:
+	global last_clicked
+	
+	last_clicked = False
+	buttons = ChoiceButtons(
+		{'🎁 Claim!': ButtonStyle.green},
+		player=None,
+		timeout=None
+	)
+	
+	message: Message = await channel.send(file=File('assets/icons/burger.png'), view=buttons)
+	await buttons.wait()
+	
+	player: Player | None = database.get_player(buttons.player_clicked.id)
+	if not player:
+		await channel.send(
+			embed=embeds.simple_embed(
+				f'{buttons.player_clicked.mention} '
+				f'❌ You do not own a burger joint!',
+				'Use the `/start` command to '
+				'start your very own burger joint!',
+				Color.red()
+			)
+		)
+		return
+	
+	await message.edit(content=f'{player.username} claimed this spawn!', view=None)
+	last_clicked = True
+	player.balance += 1000
+	database.save_data(player)
 
 
 @bot.slash_command(description='')
-async def start(ctx: ApplicationContext):
+async def start(ctx: ApplicationContext) -> None:
 	player: Player | None = database.get_player(ctx.author.id)
 	if not player:
 		database.create_new_player(ctx.author)
@@ -80,13 +142,13 @@ def status_embed(player: Player) -> Embed:
 
 @bot.slash_command(description='Display your joint\'s status.')
 @player_check
-async def status(ctx: ApplicationContext):
+async def status(ctx: ApplicationContext) -> None:
 	await ctx.respond(embed=status_embed(ctx.player))  # type: ignore
 
 
 @bot.slash_command(description='Rename your burger joint.')
 @player_check
-async def rename(ctx: ApplicationContext, new_name: str):
+async def rename(ctx: ApplicationContext, new_name: str) -> None:
 	player: Player = ctx.player  # type: ignore
 	
 	if player.shop_name == new_name:
@@ -136,5 +198,5 @@ def badges_embed(player: Player) -> Embed:
 
 @bot.slash_command(description='')
 @player_check
-async def badges(ctx: ApplicationContext):
+async def badges(ctx: ApplicationContext) -> None:
 	await ctx.respond(embed=badges_embed(ctx.player))  # type: ignore

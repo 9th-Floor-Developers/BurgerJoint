@@ -1,6 +1,6 @@
 from typing import override
 
-from discord import Interaction
+from discord import Interaction, User
 from discord.ui import Button, View
 from burger_joint.model import Player
 
@@ -29,10 +29,11 @@ class ChoiceButtons(PerPersonView):
 		self,
 		buttons: dict[str, int],
 		player: Player | None = None,
-		timeout: int = 30
+		timeout: int | None = 30
 	) -> None:
 		super().__init__(player=player, timeout=timeout)
 		self.value = None
+		self.player_clicked: User | None = None
 		for label, style in buttons.items():
 			self.add_item(
 				Button(
@@ -47,9 +48,13 @@ class ChoiceButtons(PerPersonView):
 		if not await super().interaction_check(interaction):
 			return True
 		
+		self.player_clicked = interaction.user
 		await interaction.response.defer()
 		self.value = interaction.data['custom_id'].lower().split()[1]
-		await self.message.edit(embed=self.message.embeds[0], view=None)
+		
+		if self.message.embeds:
+			await self.message.edit(embed=self.message.embeds[0], view=None)
+		
 		self.stop()
 		return True
 	
