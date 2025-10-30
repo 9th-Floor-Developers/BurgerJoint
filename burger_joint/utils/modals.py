@@ -12,7 +12,7 @@ from burger_joint.utils.datacheck import is_positive_int
 
 class EditingMenuItemModal(Modal):
 	def __init__(self, player: Player, menu_item_index: int):
-		super().__init__(title='Add Item to menu')
+		super().__init__(title='Edit Item from menu')
 		self.player: Player = player
 		self.menu_item_index: int = menu_item_index
 		self.food_item_ID: FoodItemID = \
