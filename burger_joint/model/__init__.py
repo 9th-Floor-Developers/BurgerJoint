@@ -23,6 +23,6 @@ __all__ = [
     'FoodCategoryID',
     'Order',
     'OrderedItem',
-    'UpgradeID'
+    'UpgradeID',
     'ALL_UPGRADES'
 ]
