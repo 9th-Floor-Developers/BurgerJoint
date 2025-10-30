@@ -93,15 +93,15 @@ class SelectAllFoodItemView(PerPersonView):
 
 
 class SelectPlayerFoodItemView(PerPersonView):
-	def __init__(self, mode: str, player=None):
+	def __init__(self, mode: str, player: Player =None):
 		super().__init__(player)
 		self.mode = mode
 		
 		options = []
-		for i, menu_item in enumerate(self.player.menu_items):
+		for index, menu_item in enumerate(self.player.menu_items):
 			options.append(
 				discord.SelectOption(
-					value=str(i),
+					value=str(index),
 					label=menu_item.name,
 					description=f'Edit the {menu_item.name} in your menu'
 				)
