@@ -35,12 +35,13 @@ def setup() -> Bot:
 async def on_ready() -> None:
 	print('Burger Joint Bot Online')
 	
-	#for guild in bot.guilds:
-	#	all_guilds[guild.id] = {
-	#		'last_clicked': True,
-	#		'spawn_channel': guild.system_channel.id
-	#	}
-	#	asyncio.create_task(spawn_upgrade_loop(guild))
+	# uncomment in final version
+	# for guild in bot.guilds:
+	# 	all_guilds[guild.id] = {
+	# 		'last_clicked': True,
+	# 		'spawn_channel': guild.system_channel.id
+	# 	}
+	# 	asyncio.create_task(spawn_upgrade_loop(guild))
 
 
 @bot.slash_command(description='')
@@ -79,7 +80,7 @@ async def spawn_upgrade_message(
 	)
 	
 	base_dir = Path(__file__).resolve().parent
-	data_path = os.path.join(base_dir, 'assets', 'icons', 'burger.png')
+	data_path = os.path.join(base_dir, 'assets', 'images', 'burger.png')
 	
 	message: Message = await channel.send(file=File(data_path), view=buttons)
 	await buttons.wait()
