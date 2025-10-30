@@ -39,7 +39,7 @@ ALL_UPGRADES: dict[UpgradeID, Upgrade] = {
 		'Cash Register', UpgradeID.CASH_REGISTER.value, 5_000
 	),
 	UpgradeID.COOK: Employee(
-		'Cook', UpgradeID.COOK.value, 100
+		'Cook', UpgradeID.COOK.value, 100, level=5
 	)
 }
 

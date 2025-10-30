@@ -35,12 +35,12 @@ def setup() -> Bot:
 async def on_ready() -> None:
 	print('Burger Joint Bot Online')
 	
-	for guild in bot.guilds:
-		all_guilds[guild.id] = {
-			'last_clicked': True,
-			'spawn_channel': guild.system_channel.id
-		}
-		asyncio.create_task(spawn_upgrade_loop(guild))
+	#for guild in bot.guilds:
+	#	all_guilds[guild.id] = {
+	#		'last_clicked': True,
+	#		'spawn_channel': guild.system_channel.id
+	#	}
+	#	asyncio.create_task(spawn_upgrade_loop(guild))
 
 
 @bot.slash_command(description='')

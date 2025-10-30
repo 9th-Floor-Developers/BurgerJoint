@@ -1,7 +1,7 @@
 # data class modules
 
-from .constants import ALL_BADGES, ALL_FOOD_ITEMS, STARTING_MENU
-from .enums import BadgeID, FoodItemID, FoodCategoryID
+from .constants import ALL_BADGES, ALL_FOOD_ITEMS, STARTING_MENU, ALL_UPGRADES
+from .enums import BadgeID, FoodItemID, FoodCategoryID, UpgradeID
 from .player import Player
 from .upgrades import Upgrade, Employee
 from .badge import Badge
@@ -22,5 +22,7 @@ __all__ = [
     'FoodItemID',
     'FoodCategoryID',
     'Order',
-    'OrderedItem'
+    'OrderedItem',
+    'UpgradeID'
+    'ALL_UPGRADES'
 ]
