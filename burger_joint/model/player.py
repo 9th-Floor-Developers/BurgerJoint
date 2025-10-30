@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from discord import ApplicationContext, Interaction, Color
+from discord import Color, Interaction, TextChannel
 
-from burger_joint.model.upgrades import Employee, Upgrade
-from burger_joint.model.enums import BadgeID
 from burger_joint.model.constants import ALL_BADGES
+from burger_joint.model.enums import BadgeID
 from burger_joint.model.food_item import MenuItem
+from burger_joint.model.upgrades import Employee, Upgrade
 
 
 @dataclass
@@ -23,13 +23,10 @@ class Player:
 	menu_items: list[MenuItem]
 	prestige: int
 	
-	def __post_init__(self):
-		pass  # any calculations after init if necessary
-	
 	async def unlock_badge(
 		self,
 		badge_id: BadgeID,
-		ctx: ApplicationContext
+		ctx: TextChannel
 	) -> None:
 		from burger_joint.utils import embeds
 		
@@ -38,7 +35,7 @@ class Player:
 			self.balance += ALL_BADGES[badge_id].reward
 			await ctx.send(
 				embed=embeds.simple_embed(
-					f'🎉 {ctx.author.name} has earned the {badge_id.value} badge!',
+					f'🎉 {self.username} has earned the {badge_id.value} badge!',
 					f'{self.shop_name} received ${ALL_BADGES[badge_id].reward}!'
 				)
 			)
@@ -54,10 +51,7 @@ class Player:
 		for item in self.menu_items:
 			from burger_joint.utils import embeds
 			
-			if item.name.strip() != name.strip():
-				continue
-			
-			if not interaction:
+			if item.name.strip() != name.strip() or not interaction:
 				continue
 			
 			await interaction.respond(
