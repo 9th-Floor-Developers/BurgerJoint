@@ -3,7 +3,8 @@ from typing import override
 from discord import Embed, InputTextStyle, Interaction
 from discord.ui import InputText, Modal
 
-from burger_joint.model import ALL_FOOD_ITEMS, FoodItemID, MenuItem, Player
+from burger_joint.model import ALL_FOOD_ITEMS, BadgeID, FoodItemID, MenuItem, \
+	Player
 from burger_joint.model.food_item import FoodItem
 from burger_joint.utils.database import save_data
 from burger_joint.utils.datacheck import is_positive_int
@@ -124,4 +125,5 @@ class SettingAddedMenuItemModal(Modal):
 				prestige=0
 			)
 		)
+		await self.player.unlock_badge(BadgeID.ADD_MENU_ITEM, interaction.channel)
 		save_data(self.player)
