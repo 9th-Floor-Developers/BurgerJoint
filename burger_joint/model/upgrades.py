@@ -11,8 +11,8 @@ class Upgrade:
 	
 	def upgrade(self):
 		self.cost *= self.mult
-		round(self.cost, 2)
-		self.mult = self.mult + (.1 * self.level)
+		self.cost = round(self.cost, 2)
+		self.mult += 0.1
 		self.level += 1
 
 
