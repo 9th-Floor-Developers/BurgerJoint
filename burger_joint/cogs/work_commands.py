@@ -5,7 +5,9 @@ from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
-from burger_joint.model import ALL_FOOD_ITEMS, MenuItem, Order, OrderedItem, \
+from burger_joint.model import ALL_FOOD_ITEMS, BadgeID, FoodItemID, MenuItem, \
+	Order, \
+	OrderedItem, \
 	Player
 from burger_joint.utils import database
 
@@ -142,17 +144,26 @@ class WorkSession:
 			
 			item.state = \
 				'finished' if item.progress >= item.get_required_progress() \
-				else 'working'
+					else 'working'
 	
 	async def update_finished_orders(self) -> None:
 		for order in self.orders:
-			if order.is_finished():
-				self.avg_waiting_time += order.timer - order.get_expected_waiting_time()
-				self.avg_quality += order.get_avg_quality()
-				
-				self.money_earned += order.get_total_price()
-				self.finished_orders += 1
-				self.orders.remove(order)
+			if not order.is_finished():
+				continue
+			
+			burgers_sold: int = 0
+			for item in order.ordered_items:
+				if item.menu_item.food_item_ID == FoodItemID.CLASSIC_BURGER:
+					burgers_sold += item.amount
+			self.player.burgers_sold += burgers_sold
+			
+			self.avg_waiting_time += order.timer - order.get_expected_waiting_time()
+			self.avg_quality += order.get_avg_quality()
+			
+			self.money_earned += order.get_total_price()
+			self.finished_orders += 1
+			self.orders.remove(order)
+		
 	
 	@updater.before_loop
 	async def start_session(self) -> None:
@@ -164,6 +175,8 @@ class WorkSession:
 	@updater.after_loop
 	async def finnish_session(self) -> None:
 		self.player.balance += self.money_earned  # type: ignore
+		
+		await self.check_achievements()
 		
 		if self.finished_orders > 0:
 			self.avg_waiting_time = round(
@@ -190,6 +203,31 @@ class WorkSession:
 		await self.message_display.channel.send(
 			embed=self.work_session_finish_orders_embed(rewards_text),
 		)
+	
+	async def check_achievements(self):
+		channel = self.ctx.channel
+		if self.player.balance >= 5_000:
+			await self.player.unlock_badge(
+				BadgeID.REACH_5K_INCOME, channel
+			)
+		
+		burgers_sold: int = self.player.burgers_sold
+		if burgers_sold >= 1:
+			await self.player.unlock_badge(
+				BadgeID.SELL_1_BURGER, channel
+			)
+		if burgers_sold >= 100:
+			await self.player.unlock_badge(
+				BadgeID.SELL_100_BURGERS, channel
+			)
+		if burgers_sold >= 1000:
+			await self.player.unlock_badge(
+				BadgeID.SELL_1000_BURGERS, channel
+			)
+		if burgers_sold >= 10_000:
+			await self.player.unlock_badge(
+				BadgeID.SELL_10000_BURGERS, channel
+			)
 	
 	def work_session_embed(self) -> Embed:
 		if self.counter < ON_START_TAKING_ORDERS:
