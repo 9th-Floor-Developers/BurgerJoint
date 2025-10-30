@@ -1,10 +1,9 @@
-"""Bot initialization, event loop, command loader"""
 import asyncio
+from typing import Any
 
 import discord
 from discord import ApplicationContext, Bot, ButtonStyle, Color, Embed, File, \
-	Intents, Message, TextChannel
-from discord.ext import tasks
+	Guild, Intents, Message, TextChannel
 
 from burger_joint.model import BadgeID, Player
 from burger_joint.utils import ChoiceButtons, database
@@ -14,8 +13,7 @@ from utils.decorators import player_check
 from utils.embeds import simple_embed
 
 bot = Bot(intents=Intents.all())
-last_clicked = True
-unburying = False
+all_guilds: dict[int, dict[str, Any]] = {}
 
 
 def setup() -> Bot:
@@ -37,41 +35,42 @@ async def on_ready() -> None:
 	
 	for guild in bot.guilds:
 		if guild.system_channel:
-			await spawn_upgrade_timer.start(guild.system_channel)
+			all_guilds[guild.id] = {'last_clicked': True}
+			asyncio.create_task(spawn_upgrade_loop(guild))
 
 
-@tasks.loop(minutes=10)
-async def spawn_upgrade_timer(channel: TextChannel) -> None:
-	if not last_clicked:
-		asyncio.create_task(unbury_spawn_upgrade_timer())
-	else:
-		asyncio.create_task(spawn_upgrade_message(channel))
-
-
-async def unbury_spawn_upgrade_timer() -> None:
-	global unburying, last_clicked
-	if unburying:
+async def spawn_upgrade_loop(guild: Guild):
+	channel: TextChannel = guild.system_channel
+	if not channel:
 		return
 	
-	unburying = True
-	await asyncio.sleep(86_400)  # number of seconds in a day
+	while True:
+		guild_status: dict[str, Any] | None = all_guilds[guild.id]
+		if not guild_status or not guild_status['last_clicked']:
+			break
+		
+		await spawn_upgrade_message(channel, guild_status)
+		
+		await asyncio.sleep(10)
 	
-	if not last_clicked:
-		last_clicked = True
-		unburying = False
+	all_guilds.pop(guild.id, None)
 
 
-async def spawn_upgrade_message(channel: TextChannel) -> None:
-	global last_clicked
+async def spawn_upgrade_message(
+	channel: TextChannel,
+	guild_status: dict[str, Any]
+) -> None:
+	guild_status['last_clicked'] = False
 	
-	last_clicked = False
 	buttons = ChoiceButtons(
 		{'🎁 Claim!': ButtonStyle.green},
 		player=None,
 		timeout=None
 	)
 	
-	message: Message = await channel.send(file=File('assets/icons/burger.png'), view=buttons)
+	message: Message = await channel.send(
+		file=File('assets/icons/burger.png'), view=buttons
+	)
 	await buttons.wait()
 	
 	player: Player | None = database.get_player(buttons.player_clicked.id)
@@ -87,8 +86,11 @@ async def spawn_upgrade_message(channel: TextChannel) -> None:
 		)
 		return
 	
-	await message.edit(content=f'{player.username} claimed this spawn!', view=None)
-	last_clicked = True
+	await message.edit(
+		content=f'{player.username} claimed this spawn!', view=None
+	)
+	guild_status['last_clicked'] = True
+	
 	player.balance += 1000
 	database.save_data(player)
 
