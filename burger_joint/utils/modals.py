@@ -125,5 +125,7 @@ class SettingAddedMenuItemModal(Modal):
 				prestige=0
 			)
 		)
-		await self.player.unlock_badge(BadgeID.ADD_MENU_ITEM, interaction.channel)
+		await self.player.unlock_badge(
+			BadgeID.ADD_MENU_ITEM, interaction.channel
+		)
 		save_data(self.player)
