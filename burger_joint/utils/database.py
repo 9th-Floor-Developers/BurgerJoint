@@ -12,9 +12,7 @@ from burger_joint.model import BadgeID, FoodItemID, MenuItem, Player, \
 
 def json_path() -> str:
 	base_dir = Path(__file__).resolve().parent.parent
-	data_path = os.path.join(
-		base_dir, 'assets', 'data.json'
-	)
+	data_path = os.path.join(base_dir, 'assets', 'data.json')
 	return data_path
 
 

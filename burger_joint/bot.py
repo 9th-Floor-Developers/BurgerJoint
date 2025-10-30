@@ -1,4 +1,6 @@
 import asyncio
+import os
+from pathlib import Path
 from typing import Any
 
 import discord
@@ -68,9 +70,10 @@ async def spawn_upgrade_message(
 		timeout=None
 	)
 	
-	message: Message = await channel.send(
-		file=File('assets/icons/burger.png'), view=buttons
-	)
+	base_dir = Path(__file__).resolve().parent
+	data_path = os.path.join(base_dir, 'assets', 'icons', 'burger.png')
+	
+	message: Message = await channel.send(file=File(data_path), view=buttons)
 	await buttons.wait()
 	
 	player: Player | None = database.get_player(buttons.player_clicked.id)
