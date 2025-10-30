@@ -1,6 +1,6 @@
 from typing import override
 
-from discord import Interaction, User
+from discord import ApplicationContext, Interaction, User
 from discord.ui import Button, View
 from burger_joint.model import Player
 
@@ -9,10 +9,12 @@ class PerPersonView(View):
 	def __init__(
 		self,
 		player: Player | None = None,
+		ctx: ApplicationContext | None = None,
 		timeout: int = 2100
 	) -> None:
 		super().__init__(timeout=timeout)
-		self.player = player
+		self.player: Player | None = player
+		self.ctx: ApplicationContext | None = ctx
 	
 	@override
 	async def interaction_check(self, interaction: Interaction) -> bool:
