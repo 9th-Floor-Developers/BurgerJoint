@@ -36,23 +36,31 @@ async def on_ready() -> None:
 	print('Burger Joint Bot Online')
 	
 	for guild in bot.guilds:
-		if guild.system_channel:
-			all_guilds[guild.id] = {'last_clicked': True}
-			asyncio.create_task(spawn_upgrade_loop(guild))
+		all_guilds[guild.id] = {
+			'last_clicked': True,
+			'spawn_channel': guild.system_channel.id
+		}
+		asyncio.create_task(spawn_upgrade_loop(guild))
 
 
-async def spawn_upgrade_loop(guild: Guild):
-	channel: TextChannel = guild.system_channel
-	if not channel:
-		return
-	
+@bot.slash_command(description='')
+async def set_spawn_channel(
+	ctx: ApplicationContext,
+	channel: TextChannel
+) -> None:
+	all_guilds[channel.guild.id]['spawn_channel'] = channel.id
+	await ctx.respond(f'Item spawn channel changed to: {channel.name}')
+
+
+async def spawn_upgrade_loop(guild: Guild) -> None:
 	while True:
 		guild_status: dict[str, Any] | None = all_guilds[guild.id]
 		if not guild_status or not guild_status['last_clicked']:
 			break
 		
-		await spawn_upgrade_message(channel, guild_status)
-		
+		await spawn_upgrade_message(
+			guild.get_channel(guild_status['spawn_channel']), guild_status
+		)
 		await asyncio.sleep(10)
 	
 	all_guilds.pop(guild.id, None)
