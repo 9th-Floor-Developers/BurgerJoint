@@ -5,10 +5,11 @@ from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
-from burger_joint.model import ALL_FOOD_ITEMS, BadgeID, FoodItemID, MenuItem, \
+from burger_joint.model import ALL_FOOD_ITEMS, BadgeID, FoodCategoryID, \
+	FoodItem, FoodItemID, MenuItem, \
 	Order, \
 	OrderedItem, \
-	Player
+	Player, UpgradeID
 from burger_joint.utils import database
 
 ON_START_TAKING_ORDERS = 3
@@ -49,6 +50,9 @@ class WorkSession:
 				ALL_FOOD_ITEMS[menu_item.food_item_ID].default_price
 			
 			desire -= (menu_item.price / default_price - 1)
+			desire += self.player.get_upgrade(
+				UpgradeID.ADVERTISEMENTS
+			).mult - 1
 			
 			desires[menu_item] = desire
 		
@@ -121,7 +125,7 @@ class WorkSession:
 			self.updater.cancel()
 	
 	async def update_work_progress(self) -> None:
-		worker_amount: int = 5  # TODO link this to amount of employees
+		worker_amount: int = self.player.get_upgrade(UpgradeID.COOK).level
 		
 		all_ordered_items: list[OrderedItem] = []
 		for order in self.orders:
@@ -135,11 +139,19 @@ class WorkSession:
 		
 		working_on_items: list[OrderedItem] = all_ordered_items[:worker_amount]
 		for item in working_on_items:
-			# TODO link these to upgrades
 			if random.random() < 0.3:
 				item.quality -= 10  # Cook makes a mistake
 			else:
-				item.progress += 1  # Cook makes progress on the item
+				food_item_id: FoodItem = \
+					ALL_FOOD_ITEMS[item.menu_item.food_item_ID]
+				
+				food_type: UpgradeID = {
+					FoodCategoryID.BURGERS: UpgradeID.GRILL,
+					FoodCategoryID.SNACKS: UpgradeID.FRYER,
+					FoodCategoryID.DRINKS: UpgradeID.FOUNTAIN
+				}.get(food_item_id.category)
+				
+				item.progress += self.player.get_upgrade(food_type).mult
 			
 			item.state = \
 				'finished' if item.progress >= item.get_required_progress() \
@@ -162,7 +174,6 @@ class WorkSession:
 			self.money_earned += order.get_total_price()
 			self.finished_orders += 1
 			self.orders.remove(order)
-		
 	
 	@updater.before_loop
 	async def start_session(self) -> None:
@@ -259,13 +270,13 @@ class WorkSession:
 				name='Progress',
 				value=order.get_progresses_display_string(),
 				inline=True
-            )
-
-			if i >= 4 and i+1 < len(self.orders):
+			)
+			
+			if i >= 4 and i + 1 < len(self.orders):
 				embed.add_field(
-					name=f'And {len(self.orders) - (i+1)} more orders',
-                    value=chr(173),
-                    inline = False
+					name=f'And {len(self.orders) - (i + 1)} more orders',
+					value=chr(173),
+					inline=False
 				)
 				break
 			else:
@@ -274,7 +285,6 @@ class WorkSession:
 					value=chr(173),
 					inline=False
 				)
-			
 		
 		embed.add_field(
 			name='Finished orders :checkered_flag:',
@@ -331,4 +341,4 @@ class WorkSession:
 
 
 def setup(bot: Bot):
-	bot.add_cog(WorkCommands(bot))
+	bot.add_cog(WorkCommands())

@@ -7,7 +7,7 @@ from typing import Any
 from discord import User
 
 from burger_joint.model import ALL_UPGRADES, BadgeID, FoodItemID, MenuItem, \
-	Player, STARTING_MENU, Upgrade
+	Player, STARTING_MENU, Upgrade, UpgradeID
 
 
 def json_path() -> str:
@@ -20,7 +20,9 @@ def create_new_player(user: User) -> Player:
 	player = Player(
 		user_id=user.id, username=user.name,
 		shop_name=f'{user.name}\'s Burger Joint', balance=100, level=1,
-		xp=0, burgers_sold=0, upgrades=[upgrade for upgrade in ALL_UPGRADES.values()], employees=[], badges=set(),
+		xp=0, burgers_sold=0,
+		upgrades=[upgrade for upgrade in ALL_UPGRADES.values()], employees=[],
+		badges=set(),
 		menu_items=STARTING_MENU,
 		prestige=0
 	)
@@ -42,7 +44,7 @@ def get_player(user_id: int) -> Player | None:
 				BadgeID(badge)
 				for badge in player.badges
 			}
-
+			
 			player.upgrades = [
 				Upgrade(**upgrade)  # type: ignore
 				for upgrade in player.upgrades
@@ -55,6 +57,9 @@ def get_player(user_id: int) -> Player | None:
 			
 			for menu_item in player.menu_items:
 				menu_item.food_item_ID = FoodItemID(menu_item.food_item_ID)
+			
+			for upgrade in player.upgrades:
+				upgrade.upgrade_id = UpgradeID(upgrade.upgrade_id)
 			
 			return player
 	return None

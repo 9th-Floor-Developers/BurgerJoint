@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from discord import Color, Interaction, TextChannel
 
 from burger_joint.model.constants import ALL_BADGES
-from burger_joint.model.enums import BadgeID
+from burger_joint.model.enums import BadgeID, UpgradeID
 from burger_joint.model.food_item import MenuItem
 from burger_joint.model.upgrades import Employee, Upgrade
 
@@ -64,3 +64,9 @@ class Player:
 			
 			return True
 		return False
+	
+	def get_upgrade(self, upgrade_id: UpgradeID) -> Upgrade:
+		for upgrade in self.upgrades:
+			if upgrade.upgrade_id.name == upgrade_id.name:
+				return upgrade
+		raise ValueError(f'Cannot Find Upgrade: {upgrade_id} In Player.upgrades')

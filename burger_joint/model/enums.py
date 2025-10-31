@@ -13,9 +13,11 @@ class BadgeID(Enum):
 
 
 class UpgradeID(Enum):
-	DRIVE_THRU = 'Increase Customers Per Work Session'
-	CASH_REGISTER = 'Increase Cost Of All Food Items'
-	COOK = 'Increases the amount of cooking that can be done'
+	ADVERTISEMENTS = 'Increase Likeliness Of Customer Buying Item'
+	COOK = 'Increases Number Of Active Cooks Per Session'
+	GRILL = 'Cook Burgers Faster'
+	FRYER = 'Fry Fries Faster'
+	FOUNTAIN = 'Make Drinks Faster'
 
 
 class LeaderboardID(Enum):

@@ -1,4 +1,8 @@
 from dataclasses import dataclass
+from typing import override, TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from burger_joint.model import UpgradeID
 
 
 @dataclass
@@ -6,6 +10,7 @@ class Upgrade:
 	name: str
 	description: str
 	cost: int
+	upgrade_id: 'UpgradeID'
 	mult: float = 1.0
 	level: int = 0
 	

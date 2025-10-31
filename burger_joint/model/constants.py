@@ -33,14 +33,20 @@ ALL_BADGES: dict[BadgeID, Badge] = {
 }
 
 ALL_UPGRADES: dict[UpgradeID, Upgrade] = {
-	UpgradeID.DRIVE_THRU: Upgrade(
-		'Drive Thru', UpgradeID.DRIVE_THRU.value, 10_000
+	UpgradeID.ADVERTISEMENTS: Upgrade(
+		'Advertisements', UpgradeID.ADVERTISEMENTS.value, 10_000, UpgradeID.ADVERTISEMENTS,
 	),
-	UpgradeID.CASH_REGISTER: Upgrade(
-		'Cash Register', UpgradeID.CASH_REGISTER.value, 5_000
+	UpgradeID.GRILL: Upgrade(
+		'Grill', UpgradeID.GRILL.value, 1_000, UpgradeID.GRILL
+	),
+	UpgradeID.FRYER: Upgrade(
+		'Fryer', UpgradeID.FRYER.value, 1_000, UpgradeID.FRYER
+	),
+	UpgradeID.FOUNTAIN: Upgrade(
+		'Fountain', UpgradeID.FOUNTAIN.value, 1_000, UpgradeID.FOUNTAIN
 	),
 	UpgradeID.COOK: Employee(
-		'Cook', UpgradeID.COOK.value, 100, level=5
+		'Cook', UpgradeID.COOK.value, 1_000, UpgradeID.COOK, level=1
 	)
 }
 
