@@ -31,8 +31,8 @@ def menu_embed(player: Player) -> Embed:
 	for category in menu_item_categories:
 		items_text = '\n'.join(
 			f'{item.name} — ${item.price}'
-			for item in player.menu_items
-			if ALL_FOOD_ITEMS[item.food_item_ID].category == category
+				for item in player.menu_items
+				if ALL_FOOD_ITEMS[item.food_item_ID].category == category
 		)
 		
 		embed.add_field(name=category.value, value=items_text, inline=False)
@@ -93,7 +93,7 @@ class SelectAllFoodItemView(PerPersonView):
 
 
 class SelectPlayerFoodItemView(PerPersonView):
-	def __init__(self, mode: str, player: Player =None):
+	def __init__(self, mode: str, player: Player = None):
 		super().__init__(player)
 		self.mode = mode
 		

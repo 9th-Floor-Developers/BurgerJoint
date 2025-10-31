@@ -36,6 +36,7 @@ class ChoiceButtons(PerPersonView):
 		super().__init__(player=player, timeout=timeout)
 		self.value = None
 		self.player_clicked: User | None = None
+		
 		for label, style in buttons.items():
 			self.add_item(
 				Button(
