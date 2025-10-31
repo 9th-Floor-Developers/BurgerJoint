@@ -9,12 +9,13 @@ class BadgeID(Enum):
 	SELL_100_BURGERS = 'Sell 100 Burgers'
 	SELL_1000_BURGERS = 'Sell 1000 Burgers'
 	SELL_10000_BURGERS = 'Sell 10000 Burgers'
+	SECRET = '???'
 
 
 class UpgradeID(Enum):
 	DRIVE_THRU = 'Increase Customers Per Work Session'
 	CASH_REGISTER = 'Increase Cost Of All Food Items'
-	COOK = 'Increses the amount of cooking that can be done'
+	COOK = 'Increases the amount of cooking that can be done'
 
 
 class LeaderboardID(Enum):
