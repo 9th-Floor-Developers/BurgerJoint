@@ -104,8 +104,7 @@ class WorkSession:
 	@tasks.loop(seconds=0.5)
 	async def updater(self) -> None:
 		self.counter += 1
-		if ON_START_TAKING_ORDERS < self.counter < ON_END_TAKING_ORDERS \
-				and len(self.orders) < 5:  # TODO Remove hard limit
+		if ON_START_TAKING_ORDERS < self.counter < ON_END_TAKING_ORDERS:
 			await self.generate_order()
 		
 		for order in self.orders:
@@ -260,11 +259,22 @@ class WorkSession:
 				name='Progress',
 				value=order.get_progresses_display_string(),
 				inline=True
-			).add_field(
-				name=chr(173),
-				value=chr(173),
-				inline=False
-			)
+            )
+
+			if i >= 4 and i+1 < len(self.orders):
+				embed.add_field(
+					name=f'And {len(self.orders) - (i+1)} more orders',
+                    value=chr(173),
+                    inline = False
+				)
+				break
+			else:
+				embed.add_field(
+					name=chr(173),
+					value=chr(173),
+					inline=False
+				)
+			
 		
 		embed.add_field(
 			name='Finished orders :checkered_flag:',
