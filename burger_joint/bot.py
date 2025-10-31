@@ -43,6 +43,26 @@ async def on_ready() -> None:
 	# 	}
 	# 	asyncio.create_task(spawn_upgrade_loop(guild))
 
+@bot.event
+async def on_message(message):
+	if message.author == bot.user:
+		return
+
+	if not message.content.startswith('$secret'):
+		return
+	
+	player: Player | None = database.get_player(message.author.id)
+
+	if not player:
+		return
+
+	await player.unlock_badge(
+		BadgeID.SECRET, message.channel
+	)
+
+	database.save_data(player)
+
+
 
 @bot.slash_command(description='')
 async def set_spawn_channel(
