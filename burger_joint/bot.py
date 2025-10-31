@@ -34,34 +34,41 @@ def setup() -> Bot:
 @bot.event
 async def on_ready() -> None:
 	print('Burger Joint Bot Online')
-	
-	# uncomment in final version
-	# for guild in bot.guilds:
-	# 	all_guilds[guild.id] = {
-	# 		'last_clicked': True,
-	# 		'spawn_channel': guild.system_channel.id
-	# 	}
-	# 	asyncio.create_task(spawn_upgrade_loop(guild))
+
+
+# uncomment in final version
+# for guild in bot.guilds:
+# 	all_guilds[guild.id] = {
+# 		'last_clicked': True,
+# 		'spawn_channel': guild.system_channel.id
+# 	}
+# 	asyncio.create_task(spawn_upgrade_loop(guild))
 
 @bot.event
-async def on_message(message):
-	if message.author == bot.user:
+async def on_message(message: Message) -> None:
+	if message.author.bot:
 		return
-
+	
 	if not message.content.startswith('$secret'):
 		return
 	
 	player: Player | None = database.get_player(message.author.id)
-
+	
 	if not player:
+		await message.reply(
+			embed=embeds.simple_embed(
+				f'{message.author.mention} '
+				f'❌ You do not own a burger joint!',
+				'Use the `/start` command to '
+				'start your very own burger joint!',
+				Color.red()
+			)
+		)
 		return
-
-	await player.unlock_badge(
-		BadgeID.SECRET, message.channel
-	)
-
+	
+	await player.unlock_badge(BadgeID.SECRET, message.channel)
+	
 	database.save_data(player)
-
 
 
 @bot.slash_command(description='')
@@ -202,7 +209,7 @@ async def rename(ctx: ApplicationContext, new_name: str) -> None:
 			                 f'name to: "{player.shop_name}"!'
 		)
 	)
-	await player.unlock_badge(BadgeID.RENAME_JOINT, ctx)
+	await player.unlock_badge(BadgeID.RENAME_JOINT, ctx.channel)
 
 
 def badges_embed(player: Player) -> Embed:
