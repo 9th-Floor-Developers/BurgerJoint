@@ -1,6 +1,7 @@
 import random
 
-from discord import ApplicationContext, Bot, Cog, Color, Option, slash_command
+from discord import ApplicationContext, Bot, Cog, Color, Option, \
+	SlashCommandGroup
 
 from burger_joint.bot import player_check
 from burger_joint.cogs.mini_games.blackjack import BlackJack
@@ -10,10 +11,9 @@ from burger_joint.utils.decorators import cost_check
 
 
 class MiniGames(Cog):
-	def __init__(self, bot):
-		self.bot = bot
+	_casino = SlashCommandGroup('casino', 'Ruin Your Savings')
 	
-	@slash_command(description='')
+	@_casino.command(description='')
 	@player_check
 	@cost_check(extra=True)
 	async def blackjack(self, ctx: ApplicationContext, bet: int) -> None:
@@ -59,7 +59,7 @@ class MiniGames(Cog):
 			)
 		)
 	
-	@slash_command(description='')
+	@_casino.command(description='')
 	@player_check
 	@cost_check(extra=True)
 	async def coinflip(
@@ -95,4 +95,4 @@ class MiniGames(Cog):
 
 
 def setup(bot: Bot):
-	bot.add_cog(MiniGames(bot))
+	bot.add_cog(MiniGames())
