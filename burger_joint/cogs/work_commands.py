@@ -44,7 +44,7 @@ class WorkSession:
 	def get_items_desires(self) -> dict[MenuItem, float]:
 		desires: dict[MenuItem, float] = {}
 		for menu_item in self.player.menu_items:
-			desire: float = 0.6
+			desire: float = 0.1
 			default_price = \
 				ALL_FOOD_ITEMS[menu_item.food_item_ID].default_price
 			
