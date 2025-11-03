@@ -1,6 +1,6 @@
 import random
 
-from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
+from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, SlashCommandGroup, \
 	slash_command
 from discord.ext import tasks
 
@@ -12,19 +12,28 @@ from burger_joint.model import ALL_FOOD_ITEMS, BadgeID, FoodCategoryID, \
 	Player, UpgradeID
 from burger_joint.utils import database
 
-ON_START_TAKING_ORDERS = 3
-ON_END_TAKING_ORDERS = 100
+ON_START_TAKING_ORDERS_SHORT = 1
+ON_END_TAKING_ORDERS_SHORT = 10
+
+ON_START_TAKING_ORDERS_LONG = 3
+ON_END_TAKING_ORDERS_LONG = 100
 
 
 class WorkCommands(Cog):
-	@slash_command(description='Work to earn money and XP')
+	@slash_command(description='Quick work to earn money and XP')
 	@player_check
 	async def work(self, ctx: ApplicationContext):
-		WorkSession(ctx)
+		WorkSession(ctx, False)
+
+	@slash_command(description='Long work to earn money and XP')
+	@player_check
+	async def long_work(self, ctx: ApplicationContext):
+		WorkSession(ctx, True)
+
 
 
 class WorkSession:
-	def __init__(self, ctx: ApplicationContext) -> None:
+	def __init__(self, ctx: ApplicationContext, is_long: bool) -> None:
 		self.ctx = ctx
 		self.player: Player = ctx.player  # type: ignore
 		
@@ -39,6 +48,9 @@ class WorkSession:
 		
 		self.avg_waiting_time: float = 0
 		self.avg_quality: float = 0
+
+		self.on_start_taking_orders: int = ON_START_TAKING_ORDERS_LONG if is_long else ON_START_TAKING_ORDERS_SHORT
+		self.on_end_taking_orders: int = ON_END_TAKING_ORDERS_LONG if is_long else ON_END_TAKING_ORDERS_SHORT
 		
 		self.counter: int = 0
 	
@@ -83,9 +95,12 @@ class WorkSession:
 				continue
 			
 			amount: int = 1
-			if random.random() < desire / 2:
-				amount += 1
-			
+			for i in range(100):
+				if random.random() < desire:
+					amount += 1
+				else:
+					break
+				
 			ordering_items.append(
 				OrderedItem(
 					menu_item=menu_item,
@@ -105,10 +120,10 @@ class WorkSession:
 			)
 			self.total_orders += 1
 	
-	@tasks.loop(seconds=0.5)
+	@tasks.loop(seconds=0.05)
 	async def updater(self) -> None:
 		self.counter += 1
-		if ON_START_TAKING_ORDERS < self.counter < ON_END_TAKING_ORDERS:
+		if self.on_start_taking_orders < self.counter < self.on_end_taking_orders:
 			await self.generate_order()
 		
 		for order in self.orders:
@@ -121,7 +136,7 @@ class WorkSession:
 			embed=self.work_session_embed()
 		)
 		
-		if self.counter >= ON_END_TAKING_ORDERS and not self.orders:
+		if self.counter >= self.on_end_taking_orders and not self.orders:
 			self.updater.cancel()
 	
 	async def update_work_progress(self) -> None:
@@ -240,7 +255,7 @@ class WorkSession:
 			)
 	
 	def work_session_embed(self) -> Embed:
-		if self.counter < ON_START_TAKING_ORDERS:
+		if self.counter < self.on_start_taking_orders:
 			return Embed(
 				title='Preparing the joint',
 				description='Getting ready to serve some customers!',
