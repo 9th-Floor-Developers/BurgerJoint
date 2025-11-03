@@ -2,7 +2,8 @@ from burger_joint.model.badge import Badge
 from burger_joint.model.enums import BadgeID, FoodCategoryID, FoodItemID, \
 	UpgradeID
 from burger_joint.model.food_item import FoodItem, MenuItem
-from burger_joint.model.upgrades import Upgrade, Employee
+from burger_joint.model.spawnable import Spawnable
+from burger_joint.model.upgrades import Employee, Upgrade
 
 
 def get_default_menu_item(food_item_id: FoodItemID) -> MenuItem:
@@ -34,19 +35,24 @@ ALL_BADGES: dict[BadgeID, Badge] = {
 
 ALL_UPGRADES: dict[UpgradeID, Upgrade] = {
 	UpgradeID.ADVERTISEMENTS: Upgrade(
-		'Advertisements', UpgradeID.ADVERTISEMENTS.value, 10_000, UpgradeID.ADVERTISEMENTS,
+		'Advertisements', UpgradeID.ADVERTISEMENTS.value, 10_000,
+		UpgradeID.ADVERTISEMENTS, 'advertisement.png'
 	),
 	UpgradeID.GRILL: Upgrade(
-		'Grill', UpgradeID.GRILL.value, 1_000, UpgradeID.GRILL
+		'Grill', UpgradeID.GRILL.value, 1_000,
+		UpgradeID.GRILL, 'grill.png'
 	),
 	UpgradeID.FRYER: Upgrade(
-		'Fryer', UpgradeID.FRYER.value, 1_000, UpgradeID.FRYER
+		'Fryer', UpgradeID.FRYER.value, 1_000,
+		UpgradeID.FRYER, 'fryer.png'
 	),
 	UpgradeID.FOUNTAIN: Upgrade(
-		'Fountain', UpgradeID.FOUNTAIN.value, 1_000, UpgradeID.FOUNTAIN
+		'Fountain', UpgradeID.FOUNTAIN.value, 1_000,
+		UpgradeID.FOUNTAIN, 'fountain.png'
 	),
 	UpgradeID.COOK: Employee(
-		'Cook', UpgradeID.COOK.value, 1_000, UpgradeID.COOK, level=1
+		'Cook', UpgradeID.COOK.value, 1_000,
+		UpgradeID.COOK, 'cook.png', level=1
 	)
 }
 
@@ -55,7 +61,8 @@ ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
 		FoodItemID.CHEESE_BURGER.value, 10, 1, 18, FoodCategoryID.BURGERS
 	),
 	FoodItemID.DOUBLE_CHEESE_BURGER: FoodItem(
-		FoodItemID.DOUBLE_CHEESE_BURGER.value, 14, 2, 25, FoodCategoryID.BURGERS
+		FoodItemID.DOUBLE_CHEESE_BURGER.value, 14, 2, 25,
+		FoodCategoryID.BURGERS
 	),
 	FoodItemID.CLASSIC_BURGER: FoodItem(
 		FoodItemID.CLASSIC_BURGER.value, 12, 1, 20, FoodCategoryID.BURGERS
@@ -67,7 +74,8 @@ ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
 		FoodItemID.CHICKEN_SANDWICH.value, 11, 2, 17, FoodCategoryID.BURGERS
 	),
 	FoodItemID.SPICY_CHICKEN_SANDWICH: FoodItem(
-		FoodItemID.SPICY_CHICKEN_SANDWICH.value, 12, 3, 18, FoodCategoryID.BURGERS
+		FoodItemID.SPICY_CHICKEN_SANDWICH.value, 12, 3, 18,
+		FoodCategoryID.BURGERS
 	),
 	FoodItemID.BACON_BURGER: FoodItem(
 		FoodItemID.BACON_BURGER.value, 13, 3, 23, FoodCategoryID.BURGERS
@@ -94,7 +102,7 @@ ALL_FOOD_ITEMS: dict[FoodItemID, FoodItem] = {
 	FoodItemID.APPLE_PIE: FoodItem(
 		FoodItemID.APPLE_PIE.value, 4, 2, 9, FoodCategoryID.SNACKS
 	),
-
+	
 	FoodItemID.SODA: FoodItem(
 		FoodItemID.SODA.value, 2, 1, 6, FoodCategoryID.DRINKS
 	),
@@ -119,4 +127,13 @@ STARTING_MENU: list[MenuItem] = [
 	get_default_menu_item(FoodItemID.CLASSIC_BURGER),
 	get_default_menu_item(FoodItemID.FRIES),
 	get_default_menu_item(FoodItemID.SODA)
+]
+
+ALL_SPAWNS: list[Spawnable] = [
+	Spawnable(upgrade.image, False, upgrade_reward=upgrade.upgrade_id)
+	for upgrade in ALL_UPGRADES.values()
+]
+
+ALL_SPAWNS += [
+	Spawnable('money.png', True, cash_reward=1000)
 ]

@@ -1,6 +1,7 @@
 # data class modules
 
-from .constants import ALL_BADGES, ALL_FOOD_ITEMS, STARTING_MENU, ALL_UPGRADES
+from .constants import ALL_BADGES, ALL_FOOD_ITEMS, STARTING_MENU, ALL_UPGRADES, \
+	ALL_SPAWNS
 from .enums import BadgeID, FoodItemID, FoodCategoryID, UpgradeID
 from .player import Player
 from .upgrades import Upgrade, Employee
@@ -14,15 +15,16 @@ __all__ = [
 	'Employee',
 	'Badge',
 	'FoodItem',
-    'MenuItem',
-    'ALL_BADGES',
+	'MenuItem',
+	'ALL_BADGES',
 	'ALL_FOOD_ITEMS',
 	'STARTING_MENU',
 	'BadgeID',
-    'FoodItemID',
-    'FoodCategoryID',
-    'Order',
-    'OrderedItem',
-    'UpgradeID',
-    'ALL_UPGRADES'
+	'FoodItemID',
+	'FoodCategoryID',
+	'Order',
+	'OrderedItem',
+	'UpgradeID',
+	'ALL_UPGRADES',
+	'ALL_SPAWNS'
 ]

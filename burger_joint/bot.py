@@ -106,10 +106,11 @@ async def spawn_upgrade_message(
 		timeout=None
 	)
 	
-	base_dir = Path(__file__).resolve().parent
-	data_path = os.path.join(base_dir, 'assets', 'images', 'burger.png')
+	spawn: Spawnable = random.choice(ALL_SPAWNS)
 	
-	message: Message = await channel.send(file=File(data_path), view=buttons)
+	base_dir = Path(__file__).resolve().parent
+	absolute_path = os.path.join(base_dir, 'assets', 'images', spawn.image)
+	message: Message = await channel.send(file=File(absolute_path), view=buttons)
 	await buttons.wait()
 	
 	player: Player | None = database.get_player(buttons.player_clicked.id)
@@ -130,8 +131,7 @@ async def spawn_upgrade_message(
 	)
 	guild_status['last_clicked'] = True
 	
-	player.balance += 1000
-	database.save_data(player)
+	spawn.claim(player)
 
 
 @bot.slash_command(description='')
