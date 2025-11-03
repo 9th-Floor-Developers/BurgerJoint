@@ -69,7 +69,7 @@ class MiniGames(Cog):
 		choice: Option(str, choices=['Heads', 'Tails'])  # type: ignore
 	) -> None:
 		player: Player = ctx.player  # type: ignore
-		streak = int(.5 * bet)
+		streak = bet
 		result = random.choice(['Heads', 'Tails'])
 		
 		won = result == choice
