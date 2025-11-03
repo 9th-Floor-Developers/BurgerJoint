@@ -73,13 +73,16 @@ async def on_message(message: Message) -> None:
 	
 	database.save_data(player)
 
+
 @bot.event
 async def on_guild_join(guild: Guild):
-	await guild.system_channel.send(embed=Embed(
-		title="Welcome to burger joint ",
-		description="Utilize commands to run your very own burger joint \n Type `/start` to begin your journey",
-		color=discord.Color.green()
-	))
+	await guild.system_channel.send(
+		embed=Embed(
+			title="Welcome to burger joint ",
+			description="Utilize commands to run your very own burger joint \n Type `/start` to begin your journey",
+			color=discord.Color.green()
+		)
+	)
 
 
 @bot.slash_command(description='')
@@ -120,7 +123,9 @@ async def spawn_upgrade_message(
 	
 	base_dir = Path(__file__).resolve().parent
 	absolute_path = os.path.join(base_dir, 'assets', 'images', spawn.image)
-	message: Message = await channel.send(file=File(absolute_path), view=buttons)
+	message: Message = await channel.send(
+		file=File(absolute_path), view=buttons
+	)
 	await buttons.wait()
 	
 	player: Player | None = database.get_player(buttons.player_clicked.id)
@@ -153,10 +158,12 @@ async def start(ctx: ApplicationContext) -> None:
 			embed=embeds.simple_embed(
 				description_text='✅ You have successfully established '
 				                 'your very own burger joint!'
-			).add_field(name='basic commands',
-			   value='`/status` in order to check how your joint is doing \n'
-			   '`/work` earn some money \n'
-			   '`/upgrade` see your joint\'s upgrades and buy new ones')
+			).add_field(
+				name='basic commands',
+				value='`/status` in order to check how your joint is doing \n'
+				      '`/work` earn some money \n'
+				      '`/upgrade` see your joint\'s upgrades and buy new ones'
+			)
 		)
 	else:
 		await ctx.respond(

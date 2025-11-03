@@ -1,6 +1,6 @@
 import random
 
-from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, SlashCommandGroup, \
+from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
 	slash_command
 from discord.ext import tasks
 
@@ -24,12 +24,11 @@ class WorkCommands(Cog):
 	@player_check
 	async def work(self, ctx: ApplicationContext):
 		WorkSession(ctx, False)
-
+	
 	@slash_command(description='Long work to earn money and XP')
 	@player_check
 	async def long_work(self, ctx: ApplicationContext):
 		WorkSession(ctx, True)
-
 
 
 class WorkSession:
@@ -48,7 +47,7 @@ class WorkSession:
 		
 		self.avg_waiting_time: float = 0
 		self.avg_quality: float = 0
-
+		
 		self.on_start_taking_orders: int = ON_START_TAKING_ORDERS_LONG if is_long else ON_START_TAKING_ORDERS_SHORT
 		self.on_end_taking_orders: int = ON_END_TAKING_ORDERS_LONG if is_long else ON_END_TAKING_ORDERS_SHORT
 		
@@ -100,7 +99,7 @@ class WorkSession:
 					amount += 1
 				else:
 					break
-				
+			
 			ordering_items.append(
 				OrderedItem(
 					menu_item=menu_item,

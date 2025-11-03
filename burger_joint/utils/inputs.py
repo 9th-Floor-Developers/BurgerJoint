@@ -2,6 +2,7 @@ from typing import override
 
 from discord import ApplicationContext, Interaction, User
 from discord.ui import Button, View
+
 from burger_joint.model import Player
 
 

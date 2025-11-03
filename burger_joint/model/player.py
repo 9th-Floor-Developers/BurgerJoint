@@ -69,4 +69,6 @@ class Player:
 		for upgrade in self.upgrades:
 			if upgrade.upgrade_id.name == upgrade_id.name:
 				return upgrade
-		raise ValueError(f'Cannot Find Upgrade: {upgrade_id} In Player.upgrades')
+		raise ValueError(
+			f'Cannot Find Upgrade: {upgrade_id} In Player.upgrades'
+		)

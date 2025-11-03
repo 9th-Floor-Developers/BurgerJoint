@@ -1,7 +1,8 @@
-from dataclasses import dataclass
-from burger_joint.model.food_item import MenuItem
-from burger_joint.model.constants import ALL_FOOD_ITEMS
 import math
+from dataclasses import dataclass
+
+from burger_joint.model.constants import ALL_FOOD_ITEMS
+from burger_joint.model.food_item import MenuItem
 
 
 @dataclass
@@ -21,9 +22,10 @@ class OrderedItem:
 			ALL_FOOD_ITEMS[self.menu_item.food_item_ID].required_progress
 		length: int = 8
 		green_length: int = \
-			math.floor((self.progress % required_progress_per_piece) \
-			           / required_progress_per_piece * length
-		)
+			math.floor(
+				(self.progress % required_progress_per_piece) \
+				/ required_progress_per_piece * length
+			)
 		
 		display: str = '?'
 		match self.state:

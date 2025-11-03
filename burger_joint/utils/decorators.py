@@ -2,8 +2,8 @@ import functools
 
 from discord import ApplicationContext, Color
 
-from burger_joint.model.player import Player
 from burger_joint.model.enums import LeaderboardID
+from burger_joint.model.player import Player
 from burger_joint.utils import database, embeds
 
 
