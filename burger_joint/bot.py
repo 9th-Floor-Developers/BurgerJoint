@@ -70,6 +70,14 @@ async def on_message(message: Message) -> None:
 	
 	database.save_data(player)
 
+@bot.event
+async def on_guild_join(guild: Guild):
+	await guild.system_channel.send(embed=Embed(
+		title="Welcome to burger joint ",
+		description="Utilize commands to run your very own burger joint \n Type `/start` to begin your journey",
+		color=discord.Color.green()
+	))
+
 
 @bot.slash_command(description='')
 async def set_spawn_channel(
@@ -143,7 +151,10 @@ async def start(ctx: ApplicationContext) -> None:
 			embed=embeds.simple_embed(
 				description_text='✅ You have successfully established '
 				                 'your very own burger joint!'
-			)
+			).add_field(name='basic commands',
+			   value='`/status` in order to check how your joint is doing \n'
+			   '`/work` earn some money \n'
+			   '`/upgrade` see your joint\'s upgrades and buy new ones')
 		)
 	else:
 		await ctx.respond(
