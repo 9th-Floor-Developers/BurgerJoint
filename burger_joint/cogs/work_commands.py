@@ -95,9 +95,12 @@ class WorkSession:
 				continue
 			
 			amount: int = 1
-			if random.random() < desire / 2:
-				amount += 1
-			
+			for i in range(100):
+				if random.random() < desire:
+					amount += 1
+				else:
+					break
+				
 			ordering_items.append(
 				OrderedItem(
 					menu_item=menu_item,

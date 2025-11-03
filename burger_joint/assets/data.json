@@ -1,3 +1,153 @@
 [
-    
+    {
+        "user_id": 541352538910359563,
+        "username": "calcium_king",
+        "shop_name": "calcium_king's Burger Joint",
+        "balance": 100,
+        "level": 1,
+        "xp": 0,
+        "burgers_sold": 0,
+        "upgrades": [
+            {
+                "name": "Advertisements",
+                "description": "Increase Likeliness Of Customer Buying Item",
+                "cost": 10000,
+                "upgrade_id": "Increase Likeliness Of Customer Buying Item",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Grill",
+                "description": "Cook Burgers Faster",
+                "cost": 1000,
+                "upgrade_id": "Cook Burgers Faster",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Fryer",
+                "description": "Fry Fries Faster",
+                "cost": 1000,
+                "upgrade_id": "Fry Fries Faster",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Fountain",
+                "description": "Make Drinks Faster",
+                "cost": 1000,
+                "upgrade_id": "Make Drinks Faster",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Cook",
+                "description": "Increases Number Of Active Cooks Per Session",
+                "cost": 1000,
+                "upgrade_id": "Increases Number Of Active Cooks Per Session",
+                "mult": 1.0,
+                "level": 1
+            }
+        ],
+        "employees": [],
+        "badges": [],
+        "menu_items": [
+            {
+                "food_item_ID": "Classic Burger",
+                "name": "Classic Burger",
+                "price": 12,
+                "prestige": 0
+            },
+            {
+                "food_item_ID": "Fries",
+                "name": "Fries",
+                "price": 4,
+                "prestige": 0
+            },
+            {
+                "food_item_ID": "Soda",
+                "name": "Soda",
+                "price": 2,
+                "prestige": 0
+            }
+        ],
+        "prestige": 0
+    },
+    {
+        "user_id": 715804914516885534,
+        "username": "petepoo",
+        "shop_name": "ITS BURGIN TIME",
+        "balance": 704,
+        "level": 1,
+        "xp": 0,
+        "burgers_sold": 15,
+        "upgrades": [
+            {
+                "name": "Advertisements",
+                "description": "Increase Likeliness Of Customer Buying Item",
+                "cost": 10000,
+                "upgrade_id": "Increase Likeliness Of Customer Buying Item",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Grill",
+                "description": "Cook Burgers Faster",
+                "cost": 1000,
+                "upgrade_id": "Cook Burgers Faster",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Fryer",
+                "description": "Fry Fries Faster",
+                "cost": 1000,
+                "upgrade_id": "Fry Fries Faster",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Fountain",
+                "description": "Make Drinks Faster",
+                "cost": 1000,
+                "upgrade_id": "Make Drinks Faster",
+                "mult": 1.0,
+                "level": 0
+            },
+            {
+                "name": "Cook",
+                "description": "Increases Number Of Active Cooks Per Session",
+                "cost": 1000.0,
+                "upgrade_id": "Increases Number Of Active Cooks Per Session",
+                "mult": 1.1,
+                "level": 2
+            }
+        ],
+        "employees": [],
+        "badges": [
+            "Sell 1 Burger",
+            "Rename Your Burger Joint"
+        ],
+        "menu_items": [
+            {
+                "food_item_ID": "Classic Burger",
+                "name": "Classic Burger",
+                "price": 12,
+                "prestige": 0
+            },
+            {
+                "food_item_ID": "Fries",
+                "name": "Fries",
+                "price": 4,
+                "prestige": 0
+            },
+            {
+                "food_item_ID": "Soda",
+                "name": "Soda",
+                "price": 2,
+                "prestige": 0
+            }
+        ],
+        "prestige": -1
+    }
 ]
