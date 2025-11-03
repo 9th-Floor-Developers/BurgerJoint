@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from burger_joint.bot import setup
 
 
-def main():
+def main() -> None:
 	bot: Bot = setup()
 	load_dotenv()
 	bot.run(os.getenv('DISCORD_TOKEN'))

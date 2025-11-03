@@ -15,7 +15,7 @@ class Upgrade:
 	mult: float = 1.0
 	level: int = 0
 	
-	def upgrade(self):
+	def upgrade(self) -> None:
 		self.cost *= self.mult
 		self.cost = int(self.cost + .5)
 		self.mult += 0.1

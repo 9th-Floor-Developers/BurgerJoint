@@ -1,5 +1,5 @@
-import discord
-from discord import ApplicationContext, Bot, Cog, Color, Embed, slash_command
+from discord import ApplicationContext, Bot, ButtonStyle, Cog, Color, Embed, \
+	SelectOption, slash_command, ui
 
 from burger_joint.bot import player_check
 from burger_joint.model import ALL_FOOD_ITEMS, FoodCategoryID, FoodItemID, \
@@ -11,7 +11,7 @@ from burger_joint.utils import database, EditingMenuItemModal, embeds, \
 class MenuCommands(Cog):
 	@slash_command(description='View and edit you joint\'s menu')
 	@player_check
-	async def menu(self, ctx: ApplicationContext):
+	async def menu(self, ctx: ApplicationContext) -> None:
 		await ctx.respond(
 			embed=menu_embed(ctx.player),  # type: ignore
 			view=MenuView(player=ctx.player)  # type: ignore
@@ -19,7 +19,7 @@ class MenuCommands(Cog):
 
 
 def menu_embed(player: Player) -> Embed:
-	embed = Embed(
+	embed: Embed = Embed(
 		title=f'🍔 {player.shop_name} Menu:', color=Color.lighter_grey()
 	)
 	
@@ -41,41 +41,41 @@ def menu_embed(player: Player) -> Embed:
 
 
 class MenuView(PerPersonView):
-	@discord.ui.button(
+	@ui.button(
 		label='Add Item',
-		style=discord.ButtonStyle.success  # type: ignore
+		style=ButtonStyle.success  # type: ignore
 	)
-	async def add_item_button_callback(self, _, interaction):
+	async def add_item_button_callback(self, _, interaction) -> None:
 		await interaction.response.send_message(
 			view=SelectAllFoodItemView(player=self.player)
 		)
 	
-	@discord.ui.button(
+	@ui.button(
 		label='Remove Item',
-		style=discord.ButtonStyle.red  # type: ignore
+		style=ButtonStyle.red  # type: ignore
 	)
-	async def remove_item_button_callback(self, _, interaction):
+	async def remove_item_button_callback(self, _, interaction) -> None:
 		await interaction.response.send_message(
 			view=SelectPlayerFoodItemView(player=self.player, mode='remove')
 		)
 	
-	@discord.ui.button(
+	@ui.button(
 		label='Edit Item',
-		style=discord.ButtonStyle.primary  # type: ignore
+		style=ButtonStyle.primary  # type: ignore
 	)
-	async def edit_item_button_callback(self, _, interaction):
+	async def edit_item_button_callback(self, _, interaction) -> None:
 		await interaction.response.send_message(
 			view=SelectPlayerFoodItemView(player=self.player, mode='edit')
 		)
 
 
 class SelectAllFoodItemView(PerPersonView):
-	@discord.ui.select(
+	@ui.select(
 		placeholder='Choose a food!',
 		min_values=1,
 		max_values=1,
 		options=[
-			discord.SelectOption(
+			SelectOption(
 				value=ID.value,
 				label=data.name,
 				description='Pick this if you like '
@@ -84,7 +84,7 @@ class SelectAllFoodItemView(PerPersonView):
 			for ID, data in ALL_FOOD_ITEMS.items()
 		]
 	)
-	async def select_callback(self, select, interaction):
+	async def select_callback(self, select, interaction) -> None:
 		await interaction.response.send_modal(
 			SettingAddedMenuItemModal(
 				self.player, FoodItemID(select.values[0])
@@ -93,14 +93,14 @@ class SelectAllFoodItemView(PerPersonView):
 
 
 class SelectPlayerFoodItemView(PerPersonView):
-	def __init__(self, mode: str, player: Player = None):
+	def __init__(self, mode: str, player: Player = None) -> None:
 		super().__init__(player)
 		self.mode = mode
 		
-		options = []
+		options: list[SelectOption] = []
 		for index, menu_item in enumerate(self.player.menu_items):
 			options.append(
-				discord.SelectOption(
+				SelectOption(
 					value=str(index),
 					label=menu_item.name,
 					description=f'Edit the {menu_item.name} in your menu'
@@ -110,7 +110,7 @@ class SelectPlayerFoodItemView(PerPersonView):
 		if not options:
 			return
 		
-		select = discord.ui.Select(
+		select = ui.Select(
 			placeholder='Choose a food!',
 			min_values=1,
 			max_values=1,
@@ -135,5 +135,5 @@ class SelectPlayerFoodItemView(PerPersonView):
 		self.add_item(select)
 
 
-def setup(bot: Bot):
-	bot.add_cog(MenuCommands(bot))
+def setup(bot: Bot) -> None:
+	bot.add_cog(MenuCommands())

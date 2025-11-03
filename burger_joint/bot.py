@@ -4,12 +4,11 @@ import random
 from pathlib import Path
 from typing import Any
 
-import discord
 from discord import ApplicationContext, Bot, ButtonStyle, Color, Embed, File, \
 	Guild, \
 	Intents, Message, TextChannel
 
-from burger_joint.model import ALL_SPAWNS, BadgeID, Player
+from burger_joint.model import ALL_SPAWNS, Badge, BadgeID, Player
 from burger_joint.model.spawnable import Spawnable
 from burger_joint.utils import ChoiceButtons, database
 from model import ALL_BADGES
@@ -75,12 +74,12 @@ async def on_message(message: Message) -> None:
 
 
 @bot.event
-async def on_guild_join(guild: Guild):
+async def on_guild_join(guild: Guild) -> None:
 	await guild.system_channel.send(
 		embed=Embed(
 			title="Welcome to burger joint ",
 			description="Utilize commands to run your very own burger joint \n Type `/start` to begin your journey",
-			color=discord.Color.green()
+			color=Color.green()
 		)
 	)
 
@@ -122,7 +121,9 @@ async def spawn_upgrade_message(
 	spawn: Spawnable = random.choice(ALL_SPAWNS)
 	
 	base_dir = Path(__file__).resolve().parent
-	absolute_path = os.path.join(base_dir, 'assets', 'images', spawn.image)
+	absolute_path: str = os.path.join(
+		base_dir, 'assets', 'images', spawn.image
+	)
 	message: Message = await channel.send(
 		file=File(absolute_path), view=buttons
 	)
@@ -159,9 +160,9 @@ async def start(ctx: ApplicationContext) -> None:
 				description_text='✅ You have successfully established '
 				                 'your very own burger joint!'
 			).add_field(
-				name='basic commands',
-				value='`/status` in order to check how your joint is doing \n'
-				      '`/work` earn some money \n'
+				name='Basic Commands:',
+				value='`/status` in order to check how your joint is doing\n'
+				      '`/work` earn some money\n'
 				      '`/upgrade` see your joint\'s upgrades and buy new ones'
 			)
 		)
@@ -170,7 +171,7 @@ async def start(ctx: ApplicationContext) -> None:
 			embed=embeds.simple_embed(
 				description_text=f'🍔 {player.username} already owns '
 				                 f'a burger joint called "{player.shop_name}".',
-				embed_color=discord.Color.yellow()
+				embed_color=Color.yellow()
 			)
 		)
 
@@ -183,7 +184,7 @@ def status_embed(player: Player) -> Embed:
 		description=
 		f'🏆 Level: {player.level} | ✨ XP: {player.xp} '
 		f'| 💰 Balance: ${player.balance}',
-		color=discord.Color.green()
+		color=Color.green()
 	)
 	
 	embed.add_field(
@@ -236,7 +237,7 @@ def badges_embed(player: Player) -> Embed:
 	embed: Embed = simple_embed(f'{player.shop_name}\'s Badges:')
 	
 	for badge_id in ALL_BADGES:
-		badge_obj = ALL_BADGES[badge_id]
+		badge_obj: Badge = ALL_BADGES[badge_id]
 		
 		if player.has_badge(badge_id):
 			embed.add_field(

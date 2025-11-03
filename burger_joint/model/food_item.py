@@ -10,6 +10,7 @@ class FoodItem:
 	"""
 	Represent the base food type, the types information like how hard is it to make
 	"""
+	
 	name: str
 	default_price: int
 	difficulty: int
@@ -30,7 +31,7 @@ class MenuItem:
 	prestige: int
 	
 	@override
-	def __hash__(self):
+	def __hash__(self) -> int:
 		return hash(
 			(
 				self.food_item_ID,

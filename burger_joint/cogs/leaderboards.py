@@ -13,22 +13,22 @@ class Leaderboards(Cog):
 	
 	@_leaderboards.command(description='Displays the Balance Leaderboard')
 	@leaderboard_command('balance', LeaderboardID.BALANCE)
-	async def balance(self, ctx: ApplicationContext):
+	async def balance(self, ctx: ApplicationContext) -> None:
 		...
 	
 	@_leaderboards.command(description='Displays the XP Leaderboard')
 	@leaderboard_command('xp', LeaderboardID.XP)
-	async def xp(self, ctx: ApplicationContext):
+	async def xp(self, ctx: ApplicationContext) -> None:
 		...
 	
 	@_leaderboards.command(description='Displays the Burgers Sold Leaderboard')
 	@leaderboard_command('burgers_sold', LeaderboardID.BURGERS_SOLD)
-	async def burgers(self, ctx: ApplicationContext):
+	async def burgers(self, ctx: ApplicationContext) -> None:
 		...
 	
 	@_leaderboards.command(description='Displays the Prestige Leaderboard')
 	@leaderboard_command('prestige', LeaderboardID.PRESTIGE)
-	async def prestige(self, ctx: ApplicationContext):
+	async def prestige(self, ctx: ApplicationContext) -> None:
 		...
 
 
@@ -53,5 +53,5 @@ def leaderboard_embed(
 	return embed
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
 	bot.add_cog(Leaderboards())

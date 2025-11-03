@@ -1,6 +1,5 @@
-import discord
-from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
-	slash_command
+from discord import ApplicationContext, Bot, ButtonStyle, Cog, Color, Embed, \
+	Interaction, SelectOption, slash_command, ui
 
 from burger_joint.model import Employee, Player
 from burger_joint.utils import cost_check, database, player_check
@@ -8,15 +7,15 @@ from burger_joint.utils.inputs import PerPersonView
 
 
 class UpgradesCommands(Cog):
-	def __init__(self):
+	def __init__(self) -> None:
 		self.player: Player | None = None
 	
 	@slash_command(description='View your upgrades')
 	@player_check
-	async def upgrades(self, ctx: ApplicationContext):
+	async def upgrades(self, ctx: ApplicationContext) -> None:
 		self.player: Player = ctx.player  # type: ignore
 		embed = Embed(
-			title='Player upgrades 🛠️',
+			title='Player Upgrades 🛠️',
 			color=Color.green()
 		)
 		
@@ -41,25 +40,30 @@ class UpgradesCommands(Cog):
 
 
 class UpgradesView(PerPersonView):
-	@discord.ui.button(
+	@ui.button(
 		label='Buy upgrades',
-		style=discord.ButtonStyle.success  # type: ignore
+		style=ButtonStyle.success  # type: ignore
 	)
-	async def add_item_button_callback(self, _, interaction: Interaction):
+	async def add_item_button_callback(
+		self,
+		_,
+		interaction: Interaction
+	) -> None:
 		await interaction.respond(
 			view=SelectUpgrades(player=self.player, ctx=self.ctx)
 		)
 
 
 class SelectUpgrades(PerPersonView):
-	def __init__(self, ctx: ApplicationContext, player: Player = None):
+	def __init__(self, ctx: ApplicationContext, player: Player = None) -> None:
 		super().__init__(player)
+		
 		self.ctx = ctx
-		options = []
+		options: list[SelectOption] = []
 		
 		for i, data in enumerate(player.upgrades):
 			options.append(
-				discord.SelectOption(
+				SelectOption(
 					value=str(i),
 					label=data.name,
 					description=f'Cost: {data.cost}'
@@ -69,12 +73,12 @@ class SelectUpgrades(PerPersonView):
 		if not options:
 			return
 		
-		select = discord.ui.Select(
+		select = ui.Select(
 			placeholder='Choose an upgrade!',
 			options=options
 		)
 		
-		async def _select_callback(interaction):
+		async def _select_callback(interaction) -> None:
 			index: int = int(select.values[0])
 			await self.buy_upgrade(
 				self.ctx, index, cost=self.player.upgrades[index].cost
@@ -87,10 +91,10 @@ class SelectUpgrades(PerPersonView):
 	@cost_check(extra=True)
 	async def buy_upgrade(
 		self,
-		ctx: discord.ApplicationContext,
+		ctx: ApplicationContext,
 		index: int,
 		cost: int
-	):
+	) -> None:
 		self.player.balance -= cost
 		self.player.upgrades[index].upgrade()
 		
@@ -100,10 +104,10 @@ class SelectUpgrades(PerPersonView):
 			embed=Embed(
 				title=f'{self.player.upgrades[index].name} Bought',
 				description='This addition will help your joint grow',
-				color=discord.Color.green()
+				color=Color.green()
 			)
 		)
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
 	bot.add_cog(UpgradesCommands())

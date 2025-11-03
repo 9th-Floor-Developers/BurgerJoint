@@ -76,7 +76,7 @@ def get_all_players() -> list[Player]:
 		return players
 
 
-def json_convert(obj: Any):
+def json_convert(obj: Any) -> Any:
 	if isinstance(obj, Enum):
 		return obj.value
 	if isinstance(obj, set):
@@ -90,8 +90,11 @@ def save_data(player: Player) -> None:
 	with open(json_path(), 'r+') as f:
 		non_user_data: list[dict[str, Any]] = json.load(f)
 		
-		non_user_data = [data for data in non_user_data if
-			data['user_id'] != player.user_id]
+		non_user_data: list[dict[str, Any]] = [  # filtered non-user data
+			data
+			for data in non_user_data
+			if data['user_id'] != player.user_id
+		]
 		
 		user_data = json.loads(
 			json.dumps(player.__dict__, default=json_convert)

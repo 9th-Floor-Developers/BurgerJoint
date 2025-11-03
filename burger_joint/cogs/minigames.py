@@ -1,6 +1,6 @@
 import random
 
-from discord import ApplicationContext, Bot, Cog, Color, Option, \
+from discord import ApplicationContext, Bot, Cog, Color, Interaction, Option, \
 	SlashCommandGroup
 
 from burger_joint.bot import player_check
@@ -21,7 +21,7 @@ class MiniGames(Cog):
 		player.balance -= bet
 		game: BlackJack = BlackJack(player)
 		
-		response = await ctx.respond(
+		response: Interaction = await ctx.respond(
 			embed=embeds.simple_embed('Starting blackjack...')
 		)
 		game.message = await response.original_response()
@@ -37,20 +37,20 @@ class MiniGames(Cog):
 			
 			await game.buttons.wait()
 			
-			if game.buttons.value == 'replay':
-				if bet > player.balance:
-					await ctx.edit(
-						embed=embeds.simple_embed(
-							description_text=f'💰 You cannot spend more than you have',
-							embed_color=Color.red()
-						)
+			if game.buttons.value != 'replay':
+				break
+			
+			if bet > player.balance:
+				await ctx.edit(
+					embed=embeds.simple_embed(
+						description_text=f'💰 You cannot spend more than you have',
+						embed_color=Color.red()
 					)
-					return
-				
-				game.__init__(player)
-				game.message = await response.original_response()
-				continue
-			break
+				)
+				return
+			
+			game.__init__(player)
+			game.message = await response.original_response()
 		
 		await ctx.respond(
 			embed=embeds.simple_embed(
@@ -69,8 +69,8 @@ class MiniGames(Cog):
 		choice: Option(str, choices=['Heads', 'Tails'])  # type: ignore
 	) -> None:
 		player: Player = ctx.player  # type: ignore
-		streak = bet
-		result = random.choice(['Heads', 'Tails'])
+		streak: int = bet
+		result: str = random.choice(['Heads', 'Tails'])
 		
 		won = result == choice
 		player.balance += streak \
@@ -94,5 +94,5 @@ class MiniGames(Cog):
 			)
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
 	bot.add_cog(MiniGames())

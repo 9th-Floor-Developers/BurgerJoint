@@ -58,9 +58,10 @@ class Order:
 		return max(item.get_required_progress() for item in self.ordered_items)
 	
 	def get_avg_quality(self) -> float:
-		return sum(item.quality for item in self.ordered_items) / len(
-			self.ordered_items
-		)
+		return sum(
+			item.quality
+				for item in self.ordered_items
+		) / len(self.ordered_items)
 	
 	def get_items_display_string(self) -> str:
 		return '\n'.join(

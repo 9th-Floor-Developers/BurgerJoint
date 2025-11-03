@@ -1,15 +1,12 @@
 import random
 
 from discord import ApplicationContext, Bot, Cog, Color, Embed, Interaction, \
-	slash_command
+	slash_command, TextChannel
 from discord.ext import tasks
 
 from burger_joint.bot import player_check
 from burger_joint.model import ALL_FOOD_ITEMS, BadgeID, FoodCategoryID, \
-	FoodItem, FoodItemID, MenuItem, \
-	Order, \
-	OrderedItem, \
-	Player, UpgradeID
+	FoodItem, FoodItemID, MenuItem, Order, OrderedItem, Player, UpgradeID
 from burger_joint.utils import database
 
 ON_START_TAKING_ORDERS_SHORT = 1
@@ -22,12 +19,12 @@ ON_END_TAKING_ORDERS_LONG = 100
 class WorkCommands(Cog):
 	@slash_command(description='Quick work to earn money and XP')
 	@player_check
-	async def work(self, ctx: ApplicationContext):
+	async def work(self, ctx: ApplicationContext) -> None:
 		WorkSession(ctx, False)
 	
 	@slash_command(description='Long work to earn money and XP')
 	@player_check
-	async def long_work(self, ctx: ApplicationContext):
+	async def long_work(self, ctx: ApplicationContext) -> None:
 		WorkSession(ctx, True)
 
 
@@ -48,13 +45,18 @@ class WorkSession:
 		self.avg_waiting_time: float = 0
 		self.avg_quality: float = 0
 		
-		self.on_start_taking_orders: int = ON_START_TAKING_ORDERS_LONG if is_long else ON_START_TAKING_ORDERS_SHORT
-		self.on_end_taking_orders: int = ON_END_TAKING_ORDERS_LONG if is_long else ON_END_TAKING_ORDERS_SHORT
+		self.on_start_taking_orders: int = \
+			ON_START_TAKING_ORDERS_LONG \
+				if is_long else ON_START_TAKING_ORDERS_SHORT
+		self.on_end_taking_orders: int = \
+			ON_END_TAKING_ORDERS_LONG \
+				if is_long else ON_END_TAKING_ORDERS_SHORT
 		
 		self.counter: int = 0
 	
 	def get_items_desires(self) -> dict[MenuItem, float]:
 		desires: dict[MenuItem, float] = {}
+		
 		for menu_item in self.player.menu_items:
 			desire: float = 0.1
 			default_price = \
@@ -78,7 +80,8 @@ class WorkSession:
 			food = ALL_FOOD_ITEMS[menu_item.food_item_ID]
 			exception_food = ALL_FOOD_ITEMS[exception.food_item_ID]
 			
-			if food and exception_food and food.category != exception_food.category:
+			if food and exception_food \
+					and food.category != exception_food.category:
 				desires[menu_item] += 0.3
 		
 		return desires
@@ -94,7 +97,7 @@ class WorkSession:
 				continue
 			
 			amount: int = 1
-			for i in range(100):
+			for _ in range(100):
 				if random.random() < desire:
 					amount += 1
 				else:
@@ -228,8 +231,8 @@ class WorkSession:
 			embed=self.work_session_finish_orders_embed(rewards_text),
 		)
 	
-	async def check_achievements(self):
-		channel = self.ctx.channel
+	async def check_achievements(self) -> None:
+		channel: TextChannel = self.ctx.channel
 		if self.player.balance >= 5_000:
 			await self.player.unlock_badge(
 				BadgeID.REACH_5K_INCOME, channel
@@ -244,7 +247,7 @@ class WorkSession:
 			await self.player.unlock_badge(
 				BadgeID.SELL_100_BURGERS, channel
 			)
-		if burgers_sold >= 1000:
+		if burgers_sold >= 1_000:
 			await self.player.unlock_badge(
 				BadgeID.SELL_1000_BURGERS, channel
 			)
@@ -278,12 +281,10 @@ class WorkSession:
 		for i, order in enumerate(self.orders):
 			embed.add_field(
 				name=f'Order {i + 1}:',
-				value=order.get_items_display_string(),
-				inline=True
+				value=order.get_items_display_string()
 			).add_field(
 				name='Progress',
-				value=order.get_progresses_display_string(),
-				inline=True
+				value=order.get_progresses_display_string()
 			)
 			
 			if i >= 4 and i + 1 < len(self.orders):
@@ -301,12 +302,9 @@ class WorkSession:
 				)
 		
 		embed.add_field(
-			name='Finished orders :checkered_flag:',
-			value=f'{self.finished_orders}/{self.total_orders}', inline=True
-		).add_field(
-			name='Money Earned :moneybag::', value=f'${self.money_earned}',
-			inline=True
-		)
+			name='🏁 Finished orders:',
+			value=f'{self.finished_orders}/{self.total_orders}'
+		).add_field(name='💰 Money Earned:', value=f'${self.money_earned}')
 		
 		return embed
 	
@@ -354,5 +352,5 @@ class WorkSession:
 		return embed
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
 	bot.add_cog(WorkCommands())

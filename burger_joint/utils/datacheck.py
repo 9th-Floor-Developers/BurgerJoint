@@ -1,12 +1,11 @@
-import discord
-from discord import Color
+from discord import Color, Interaction
 
 from burger_joint.utils import embeds
 
 
 async def is_positive_int(
 	n: str,
-	interaction: discord.Interaction,
+	interaction: Interaction,
 	include_zero: bool = False,
 	var_name: str = 'inputted number'
 ) -> bool:
