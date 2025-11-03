@@ -1,13 +1,16 @@
 import asyncio
 import os
+import random
 from pathlib import Path
 from typing import Any
 
 import discord
 from discord import ApplicationContext, Bot, ButtonStyle, Color, Embed, File, \
-	Guild, Intents, Message, TextChannel
+	Guild, \
+	Intents, Message, TextChannel
 
-from burger_joint.model import BadgeID, Player
+from burger_joint.model import ALL_SPAWNS, BadgeID, Player
+from burger_joint.model.spawnable import Spawnable
 from burger_joint.utils import ChoiceButtons, database
 from model import ALL_BADGES
 from utils import embeds
@@ -89,7 +92,7 @@ async def spawn_upgrade_loop(guild: Guild) -> None:
 		await spawn_upgrade_message(
 			guild.get_channel(guild_status['spawn_channel']), guild_status
 		)
-		await asyncio.sleep(10)
+		await asyncio.sleep(600)
 	
 	all_guilds.pop(guild.id, None)
 
@@ -102,7 +105,6 @@ async def spawn_upgrade_message(
 	
 	buttons = ChoiceButtons(
 		{'🎁 Claim!': ButtonStyle.green},
-		player=None,
 		timeout=None
 	)
 	
